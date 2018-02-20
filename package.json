@@ -1,0 +1,25 @@
+{
+  "name": "mono-stack",
+  "version": "0.0.1",
+  "description": "DockerLAMP mono repo",
+  "repository": "git@github.com:dockerlamp/mono-stack.git",
+  "author": "Grzegorz Marchwinski <yankeepl@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.16.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.11.1",
+    "typescript": "^2.7.1",
+    "tslint": "^5.9.1",
+    "tslint-eslint-rules": "^4.1.1",
+    "nodemon": "^1.15.1"
+  },
+  "scripts": {
+    "build": "yarn run tsc | tee compile.log",
+    "watch": "yarn run tsc -w | tee compile.log",
+    "lint": "yarn run tslint ./src/**/*.ts",
+    "start-front": "node build/front/front.js",
+    "dev-front": "yarn run nodemon --delay 2 --watch build build/front/front.js"
+  }  
+}
