@@ -8,6 +8,10 @@ services:
       - ../..:/app
       - node-cache:/root/.npm
       - node-modules:/app/node_modules
+    command: 
+      - "yarn" 
+      - "run"
+      - "dev-front"       
 
 volumes:
   node-modules:
