@@ -18,7 +18,7 @@
   "scripts": {
     "build": "yarn run tsc | tee compile.log",
     "watch": "yarn run tsc -w | tee compile.log",
-    "lint": "yarn run tslint ./src/**/*.ts",
+    "lint": "yarn run --silent tslint ./src/**/*.ts",
     "start-front": "node build/front/front.js",
     "dev-front": "yarn run nodemon --delay 2 --watch build build/front/front.js"
   }  

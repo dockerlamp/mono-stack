@@ -1,5 +1,6 @@
 /.idea/
 /.vagrant/
+/.vscode/
 /build/
 /node_modules/
 /compile.log
