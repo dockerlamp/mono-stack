@@ -1,7 +1,9 @@
 import * as express from 'express';
 import { Request, Response } from 'express';
+import * as morgan from 'morgan';
 
-const app = express();
+let app = express();
+app.use(morgan('tiny'));
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Hello World!');
