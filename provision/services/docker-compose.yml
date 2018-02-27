@@ -2,7 +2,7 @@ version: "2"
 
 services:
   front-server:
-    image: node:8.9.3
+    image: node:8.9.4
     working_dir: /app
     command: 
       - "yarn" 

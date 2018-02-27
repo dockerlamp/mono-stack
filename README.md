@@ -39,6 +39,11 @@ cd provision/services
 docker-compose up -d
 ```
 
+You can create file `.env` in services folder to setup some enviromental variables. Example of docker-compose project name change:
+```
+COMPOSE_PROJECT_NAME=monostack
+```
+
 # UI
 
 http://localhost:3000 or http://monostack.vagrant:3000

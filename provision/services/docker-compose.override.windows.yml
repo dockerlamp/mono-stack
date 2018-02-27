@@ -1,0 +1,14 @@
+version: "2"
+
+services:
+  front-server:
+    ports: 
+      - 3000:3000
+    volumes:
+      - ../..:/app
+      - node-cache:/root/.npm
+      - node-modules:/app/node_modules
+
+volumes:
+  node-modules:
+  node-cache:
