@@ -17,10 +17,14 @@
     "typescript": "^2.7.1",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^4.1.1",
-    "nodemon": "^1.15.1"    
+    "nodemon": "^1.15.1",
+    "rimraf": "^2.6.2",
+    "copyfiles": "^1.2.0"
   },
   "scripts": {
-    "build": "yarn run tsc | tee compile.log",
+    "build": "yarn run clean & yarn run copy-json & yarn run tsc | tee compile.log",
+    "copy-json": "yarn run copyfiles --up 1 ./src/**/*.json ./build/",
+    "clean": "yarn run --silent rimraf ./build/*",
     "watch": "yarn run tsc -w | tee compile.log",
     "lint": "yarn run --silent tslint ./src/**/*.ts",
     "start-front": "node build/front/front.js",
