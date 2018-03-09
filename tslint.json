@@ -34,14 +34,7 @@
                 "SwitchCase": 1
             }
         ],
-        "trailing-comma": [
-            true,
-            {
-                "esSpecCompliant": true,
-                "multiline": "always",
-                "singleline": "never"
-            }
-        ],
+        "trailing-comma": false,
         "variable-name": [
             true,
             "ban-keywords",
