@@ -6,6 +6,9 @@ import * as strategy from 'passport-github';
 
 let app = express();
 app.use(morgan('tiny'));
+app.use(passport.initialize());
+app.use(passport.session());
+
 let gitHubStrategy = strategy.Strategy;
 
 passport.use(new gitHubStrategy({
@@ -15,11 +18,15 @@ passport.use(new gitHubStrategy({
 },
 (accessToken, refreshToken, profile, cb) => {
     console.log(accessToken, refreshToken, profile);
-    cb(null, {});
+    cb(null, profile);
 }));
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
+passport.serializeUser((user, done) => {
+    done(null, user);
+});
+
+passport.deserializeUser((user, done) => {
+    done(null, user);
 });
 
 app.get('/auth/github',
@@ -28,8 +35,8 @@ app.get('/auth/github',
 app.get('/auth/github/logged',
     passport.authenticate('github', { failureRedirect: '/login' }),
     (req, res) => {
-        // Successful authentication, redirect home.
-        res.redirect('/');
+        // Successful authentication
+        res.send('Hello World! mr. ' + req.user.username);
     });
 
 app.listen(3000, () => {
