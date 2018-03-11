@@ -1,11 +1,14 @@
 import * as cqrsDomain from 'cqrs-domain';
+import { IPerson, IEmail } from './IPerson';
 
-export default cqrsDomain.defineAggregate({
-    name: 'person',
-}, {
-    emails: [],
-    phoneNumbers: [],
-}).defineSnapshotNeed((loadingTime, events, aggregate) => {
-    console.log('defineSnapshotNeed', loadingTime);
-    return events.length >= 20;
-});
+let aggregateDefaults: IPerson = {
+    emails: []
+};
+export default cqrsDomain
+    .defineAggregate({
+        name: 'person'
+    }, aggregateDefaults)
+    .defineSnapshotNeed((loadingTime, events, aggregate) => {
+        console.log('defineSnapshotNeed', loadingTime);
+        return events.length >= 20;
+    });

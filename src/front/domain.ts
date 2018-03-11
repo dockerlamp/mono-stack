@@ -17,7 +17,7 @@ let addPerson = (person: any, personId?: string) => {
         command.aggregate = {
             id: personId,
             name: 'person'
-        }
+        };
     }
     domain.handle(command, (err) => {
         if (err) {
@@ -82,8 +82,4 @@ domain.init((err, warnings) => {
     addEmail('blabla@gmail.com', '1');
     addEmail(null, '1');
     removePerson('1');
-
-    // _.each(_.range(1, 5), (num) => {
-    //     addPerson(_.sample(_.range(1, 5)).toString());
-    // });
 });

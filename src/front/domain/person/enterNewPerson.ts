@@ -1,5 +1,6 @@
 import * as _ from 'lodash';
 import * as cqrsDomain from 'cqrs-domain';
+import { IPerson } from './IPerson';
 
 const dbg = (input: any) => {
     return JSON.stringify(input, null, 4);
