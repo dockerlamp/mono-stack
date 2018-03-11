@@ -1,7 +1,6 @@
 import * as cqrsDomain from 'cqrs-domain';
 import * as path from 'path';
 import * as _ from 'lodash';
-import * as jspath from 'jspath';
 
 let domain = cqrsDomain({
     domainPath: path.join(__dirname, './domain'),
@@ -72,7 +71,7 @@ domain.init((err, warnings) => {
         console.warn('----INIT WARNINGS: ', warnings);
     }
     let info = domain.getInfo();
-    console.log(jspath.apply('..*.name', info));
+    console.log(info);
     let person = {
         firstname: _.sample(['Jack', 'John', 'Emil', 'George', 'James']),
         lastname: _.sample(['Huston', 'Doe', 'Brown', 'Red', 'Bond']),

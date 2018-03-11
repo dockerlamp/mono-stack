@@ -24,6 +24,7 @@
         "no-empty-interface": false,
         "prefer-const": false,
         "eofline": false,
+        "object-literal-shorthand": false,
         "quotemark": [
             true,
             "single"
