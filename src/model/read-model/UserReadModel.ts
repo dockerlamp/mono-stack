@@ -1,11 +1,14 @@
 import { EventEmitter } from 'events';
 
+/**
+ * Create read model using write model events
+ */
 export class UserReadModel {
     private sessions: {[sessioId: string]: any} = {};
 
-    constructor( private userEmitter: EventEmitter) {
-
+    constructor(private userEmitter: EventEmitter) {
         let updateSessions = (user) => {
+            // index users by sessionId
             user.sessionIds.forEach((sessionId) => {
                 this.sessions[sessionId] = user;
             });
