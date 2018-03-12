@@ -11,6 +11,5 @@ export class LoginUserHandler implements ICommandHandler {
 
     public async handle(command: ILoginUser) {
         let id = await this.userModel.saveUser(command.user);
-        console.log(`command ${command.name} handled, userId = ${id}`);
     }
 }
