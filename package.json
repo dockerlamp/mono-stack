@@ -18,12 +18,15 @@
     "@types/cqrs-domain": "^2.10.0",
     "@types/lodash": "^4.14.104",
     "@types/uuid": "^3.4.3",
+    "@types/jest": "^22.2.0",
     "typescript": "^2.7.1",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^4.1.1",
     "nodemon": "^1.15.1",
     "rimraf": "^2.6.2",
-    "copyfiles": "^1.2.0"
+    "copyfiles": "^1.2.0",
+    "jest": "^22.4.2",
+    "ts-jest":"^22.4.1"
   },
   "scripts": {
     "build": "yarn run clean & yarn run copy-json & yarn run tsc | tee compile.log",
