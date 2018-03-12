@@ -1,7 +1,7 @@
 import { ICommandHandler } from './ICommandHandler';
-import { ICommand } from '../command/ICommand';
 import { UserWriteModel } from '../write-model/UserWriteModel';
 import { LoginUserCommand } from '../command/LoginUser';
+import { ILoginUser } from '../command/ILoginUser';
 
 export class LoginUserHandler implements ICommandHandler {
     public name: string = 'login-user';
@@ -9,9 +9,8 @@ export class LoginUserHandler implements ICommandHandler {
     constructor(private userModel: UserWriteModel) {
     }
 
-    public async handle(command: ICommand) {
-        let userLoginCommand: LoginUserCommand = (command as LoginUserCommand);
-        let id = await this.userModel.saveUser(userLoginCommand.user);
-        console.log(`command ${userLoginCommand.name} handled, userId = ${id}`);
+    public async handle(command: ILoginUser) {
+        let id = await this.userModel.saveUser(command.user);
+        console.log(`command ${command.name} handled, userId = ${id}`);
     }
 }

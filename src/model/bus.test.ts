@@ -4,6 +4,7 @@ import { LoginUserCommand } from './command/LoginUser';
 import { UserWriteModel } from './write-model/UserWriteModel';
 import * as uuid from 'uuid';
 import { UserReadModel } from './read-model/UserReadModel';
+import { ILoginUser } from './command/ILoginUser';
 
 async function test() {
     // configure command bus
@@ -14,14 +15,7 @@ async function test() {
     bus.registerCommandHandler(handler);
 
     let sessionId = '12345-123-123';
-    // let command = new LoginUserCommand();
-    // command.id = Math.round( Math.random() * 1000 ).toString();
-    // command.user = {
-    //     email: 'foo@bar.com',
-    //     userName: 'John Doe',
-    //     sessionId: sessionId,
-    // };
-    let command = {
+    let command: ILoginUser = {
         name: 'login-user',
         id: uuid.v4(),
         user: {

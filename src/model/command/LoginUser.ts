@@ -1,6 +1,6 @@
-import { ICommand } from './ICommand';
+import { ILoginUser } from './ILoginUser';
 
-export class LoginUserCommand implements ICommand {
+export class LoginUserCommand implements ILoginUser {
     public name: string = 'login-user';
     public id: string;
 
