@@ -1,4 +1,5 @@
 import * as express from 'express';
+import * as session from 'express-session';
 import { Request, Response } from 'express';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
@@ -8,6 +9,9 @@ let app = express();
 app.use(morgan('tiny'));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(session({
+    secret: 'dockerlamp',
+}));
 
 let gitHubStrategy = strategy.Strategy;
 
@@ -16,8 +20,8 @@ passport.use(new gitHubStrategy({
     clientSecret: '52449d1083251457705a2397442c713176e4a33a',
     callbackURL: 'http://127.0.0.1:3000/login/github/callback',
 },
+
 (accessToken, refreshToken, profile, cb) => {
-    console.log(accessToken, refreshToken, profile);
     cb(null, profile);
 }));
 
@@ -38,6 +42,9 @@ app.get('/login/github/callback',
         // Successful authentication
         res.send('Hello World! mr. ' + req.user.username);
     });
+
+app.get('/', (req, res) => {
+});
 
 app.listen(3000, () => {
     console.log('Front app listening on port 3000!');
