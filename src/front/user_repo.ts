@@ -8,14 +8,14 @@ export class UserRepo {
     public addUser(provider: string, userProfile: any) {
 
         if (provider === 'github') {
-            let userExist = false;
+            let userExists = false;
             this.users.forEach( (user) => {
                 if (userProfile.id === user.externalId[provider]) {
-                    userExist = true;
+                    userExists = true;
                 }
             });
 
-            if (!userExist) {
+            if (!userExists) {
                 let newUser = new User();
                 // TODO review and incorporate all user profile data
                 newUser.externalId[provider] = userProfile.id;
