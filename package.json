@@ -8,14 +8,12 @@
   "dependencies": {
     "express": "^4.16.2",
     "morgan": "^1.9.0",
-    "cqrs-domain": "^2.11.4",
     "lodash": "^4.17.5",
     "uuid": "^3.2.1"
   },
   "devDependencies": {
     "@types/express": "^4.11.1",
     "@types/morgan": "^1.7.35",
-    "@types/cqrs-domain": "^2.10.0",
     "@types/lodash": "^4.14.104",
     "@types/uuid": "^3.4.3",
     "@types/jest": "^22.2.0",
