@@ -6,6 +6,7 @@ services:
       - 3000:3000
     volumes:
       - ../..:/app
+      # @TODO this cache folder is for "npm" but we are using "yarn"
       - node-cache:/root/.npm
       - node-modules:/app/node_modules
     command: 
