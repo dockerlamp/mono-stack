@@ -1,7 +1,9 @@
+import { EventEmitter } from 'events';
+
 import { ICommand } from '../command/ICommand';
 import { ICommandHandler } from '../command-handler/ICommandHandler';
 
-export class CommandBus {
+export class CommandBus extends EventEmitter {
     private commandHandlers: {[name: string]: ICommandHandler} = {};
 
     public async sendCommand(command: ICommand) {
