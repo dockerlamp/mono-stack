@@ -3,18 +3,20 @@ import { EventEmitter } from 'events';
 import { ICommand } from '../command/ICommand';
 import { ICommandHandler } from '../command-handler/ICommandHandler';
 
-export class CommandBus extends EventEmitter {
-    private commandHandlers: {[name: string]: ICommandHandler} = {};
+export class CommandBus {
+    private eventEmitter: EventEmitter;
+
+    constructor(eventEmitter: EventEmitter = null) {
+        this.eventEmitter = eventEmitter ? eventEmitter : new EventEmitter();
+    }
 
     public async sendCommand(command: ICommand) {
-        let handler = this.commandHandlers[command.name];
-        if (!handler) {
-            throw new Error(`Handler for ${command.name} not found.`);
-        }
-        await handler.handle(command);
+        this.eventEmitter.emit(command.name, command);
     }
 
     public registerCommandHandler(handler: ICommandHandler) {
-        this.commandHandlers[handler.name] = handler;
+        this.eventEmitter.on(handler.name, async (command: ICommand) => {
+            await handler.handle(command);
+        });
     }
 }
