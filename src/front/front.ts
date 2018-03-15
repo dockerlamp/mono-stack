@@ -14,7 +14,7 @@ let gitHubStrategy = strategy.Strategy;
 passport.use(new gitHubStrategy({
     clientID: '618ce3b2f392ec237da4',
     clientSecret: '52449d1083251457705a2397442c713176e4a33a',
-    callbackURL: 'http://127.0.0.1:3000/auth/github/logged',
+    callbackURL: 'http://127.0.0.1:3000/login/github/callback',
 },
 (accessToken, refreshToken, profile, cb) => {
     console.log(accessToken, refreshToken, profile);
@@ -29,11 +29,11 @@ passport.deserializeUser((user, done) => {
     done(null, user);
 });
 
-app.get('/auth/github',
+app.get('/login/github',
   passport.authenticate('github'));
 
-app.get('/auth/github/logged',
-    passport.authenticate('github', { failureRedirect: '/login' }),
+app.get('/login/github/callback',
+    passport.authenticate('github'),
     (req, res) => {
         // Successful authentication
         res.send('Hello World! mr. ' + req.user.username);
