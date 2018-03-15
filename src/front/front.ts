@@ -5,6 +5,8 @@ import * as morgan from 'morgan';
 import * as passport from 'passport';
 import * as strategy from 'passport-github';
 
+import { UserRepo } from './user_repo';
+
 let app = express();
 app.use(morgan('tiny'));
 app.use(passport.initialize());
@@ -14,6 +16,7 @@ app.use(session({
 }));
 
 let gitHubStrategy = strategy.Strategy;
+let userRepo = new UserRepo();
 
 passport.use(new gitHubStrategy({
     clientID: '618ce3b2f392ec237da4',
@@ -39,11 +42,20 @@ app.get('/login/github',
 app.get('/login/github/callback',
     passport.authenticate('github'),
     (req, res) => {
-        // Successful authentication
-        res.send('Hello World! mr. ' + req.user.username);
+        userRepo.addUser('github', req.session.passport.user);
+        let user = userRepo.getUser('github', req.session.passport.user.id);
+        req.session.user = user;
+        res.redirect('/');
     });
 
 app.get('/', (req, res) => {
+    if (req.session.user) {
+        res.send('Hi, you are logged as ' + req.session.passport.user.username);
+        console.log('logged user', req.session.user, 'session id is', req.sessionID);
+    } else {
+        res.redirect('/login/github');
+    }
+    console.log(userRepo.repoStats());
 });
 
 app.listen(3000, () => {
