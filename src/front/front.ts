@@ -53,7 +53,9 @@ app.get('/', (req, res) => {
         res.send('Hi, you are logged as ' + req.session.passport.user.username);
         console.log('logged user', req.session.user, 'session id is', req.sessionID);
     } else {
-        res.redirect('/login/github');
+        // res.redirect('/login/github');
+        res.send('Hi, you are anonymous, please sign in!');
+        console.log('anonymous user connected');
     }
     console.log(userRepo.repoStats());
 });
