@@ -4,22 +4,9 @@ import { Request, Response } from 'express';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
 import * as strategy from 'passport-github';
-import rc = require('rc');
+import { config } from './config';
 
 import { UserRepo } from './user_repo';
-
-// @TODO definicja domyslnych wartosci, mozliwych kluczy
-interface IConfig {
-    oAuthApps: {
-        gitHub: {
-            clientID: string,
-            clientSecret: string
-            callbackURL: string
-        }
-    };
-}
-let defaultConfig = {};
-let config: IConfig = rc('monostack', defaultConfig);
 
 let app = express();
 app.use(morgan('tiny'));
