@@ -28,6 +28,7 @@ export class ApplicationFactory {
     }
 
     private setupRoutinngs(app: Express) {
+        let providerName = 'github';
         let gitHubStrategy = strategy.Strategy;
         let userRepo = new UserRepo();
 
@@ -45,14 +46,14 @@ export class ApplicationFactory {
             done(null, user);
         });
 
-        app.get('/login/github',
-          passport.authenticate('github'));
+        app.get(`/login/${providerName}`,
+          passport.authenticate(providerName));
 
-        app.get('/login/github/callback',
-            passport.authenticate('github'),
+        app.get(`/login/${providerName}/callback`,
+            passport.authenticate(providerName),
             (req, res) => {
-                userRepo.addUser('github', req.session.passport.user);
-                let user = userRepo.getUser('github', req.session.passport.user.id);
+                userRepo.addUser(providerName, req.session.passport.user);
+                let user = userRepo.getUser(providerName, req.session.passport.user.id);
                 req.session.user = user;
                 res.redirect('/');
             });
