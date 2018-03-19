@@ -4,17 +4,13 @@ import { Request, Response } from 'express';
 import * as morgan from 'morgan';
 import * as passport from 'passport';
 import * as strategy from 'passport-github';
+
 import { config } from './config';
-
 import { UserRepo } from './user_repo';
+import { ApplicationFactory } from './ApplicationFactory';
 
-let app = express();
-app.use(morgan('tiny'));
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(session({
-    secret: 'mono-stack',
-}));
+const applicationFactory = new ApplicationFactory();
+let app = applicationFactory.createApplication();
 
 let gitHubStrategy = strategy.Strategy;
 let userRepo = new UserRepo();
