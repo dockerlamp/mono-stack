@@ -51,7 +51,10 @@ export class ApplicationFactory {
 
         app.get(`/login/${providerName}/callback`,
             passport.authenticate(providerName),
-            (req, res) => {
+            /* async */(req, res) => {
+                // let userPayload = formatUser(req.session.passport.user)
+                //    commandId: uuid.v4();
+                // await bus.send(UserAuthenticateCommand, userPayload);
                 userRepo.addUser(providerName, req.session.passport.user);
                 let user = userRepo.getUser(providerName, req.session.passport.user.id);
                 req.session.user = user;
@@ -59,7 +62,14 @@ export class ApplicationFactory {
             });
 
         app.get('/', (req, res) => {
+            // Query:
+            //    v1 let user = await query.waitGithubUser(req.session.passport.user.id);
+            //    v2  let user = await query.waitForGitHubUser(commandId);
+            //    v3  let user = await query.waitForGitHubUser(session.id);
+            //    if (user) { req.session.user = user; }
+
             if (req.session.user) {
+                // @TODO tutaj passport nie powinien istniec
                 res.send('Hi, you are logged as ' + req.session.passport.user.username);
                 console.log('logged user', req.session.user, 'session id is', req.sessionID);
             } else {
