@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "DockerLAMP mono repo",
   "repository": "git@github.com:dockerlamp/mono-stack.git",
-  "author": "Grzegorz Marchwinski <yankeepl@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "express": "^4.16.2",
@@ -25,6 +24,7 @@
     "@types/lodash": "^4.14.104",
     "@types/uuid": "^3.4.3",
     "@types/jest": "^22.2.0",
+    "@types/supertest": "2.0.4",
     "typescript": "^2.7.1",
     "tslint": "^5.9.1",
     "tslint-eslint-rules": "^4.1.1",
@@ -32,7 +32,8 @@
     "rimraf": "^2.6.2",
     "copyfiles": "^1.2.0",
     "jest": "^22.4.2",
-    "ts-jest":"^22.4.1"
+    "ts-jest":"^22.4.1",
+    "supertest": "^3.0.0"
   },
   "scripts": {
     "build": "yarn run clean & yarn run copy-json & yarn run tsc | tee compile.log",
