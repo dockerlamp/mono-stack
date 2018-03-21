@@ -1,11 +1,9 @@
-import { ICommand } from './ICommand';
-
-export interface ILoginUser extends ICommand {
-    name: string;
-    id: string;
-    user: {
-        sessionId: string;
-        email: string;
-        userName: string;
-    };
+export interface ILoginUser {
+    sessionId: string;
+    provider: string;
+    providerUserId: string;
+    email?: string;
+    firstName?: string;
+    lastName?: string;
+    name?: string;
 }

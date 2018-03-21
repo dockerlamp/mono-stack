@@ -6,8 +6,8 @@ import { LoginUserHandler } from '../../../src/model/command-handler/LoginUserHa
 import { LoginUserCommand } from '../../../src/model/command/LoginUser';
 import { UserWriteModel } from '../../../src/model/write-model/UserWriteModel';
 import { UserReadModel } from '../../../src/model/read-model/UserReadModel';
-import { ILoginUser } from '../../../src/model/command/ILoginUser';
 import { GetSessionUser } from '../../../src/model/query/GetSessionUser';
+import { ILoginUserCommand } from '../../../src/model/command/ILoginUserCommand';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));
@@ -28,13 +28,15 @@ describe('CQRS', () => {
     });
 
     it('after sending command loginUser query should return logged user', async () => {
-        let command: ILoginUser = {
+        let command: ILoginUserCommand = {
             name: 'login-user',
             id: uuid.v4(),
             user: {
                 email: 'foo@bar.com',
-                userName: 'John Doe',
-                sessionId: uuid.v4()
+                name: 'foobar',
+                sessionId: uuid.v4(),
+                provider: 'foo-provider',
+                providerUserId: 'foo-id'
             }
         };
 
@@ -42,7 +44,7 @@ describe('CQRS', () => {
         await delay(25);
         let user = await getSessionUserQuery.query(command.user.sessionId);
         expect(user.email).toEqual(command.user.email);
-        expect(user.userName).toEqual(command.user.userName);
+        expect(user.name).toEqual(command.user.name);
         expect(user.sessionIds).toContainEqual(command.user.sessionId);
     });
 });
