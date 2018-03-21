@@ -7,9 +7,9 @@ import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
 describe('Express application', () => {
     let expressApplication: Express;
 
-    beforeEach(() => {
+    beforeEach(async () => {
         let applicationFactory = new ApplicationFactory();
-        expressApplication = applicationFactory.createApplication();
+        expressApplication = await applicationFactory.createApplication();
     });
 
     it('get / shoure return status 200', (done) => {
