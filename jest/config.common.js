@@ -1,4 +1,5 @@
 module.exports = {
+    rootDir: '../',
     globals: {
         'ts-jest': {
             tsConfigFile: 'tsconfig.json',
