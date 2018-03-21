@@ -1,14 +1,11 @@
-import * as express from 'express';
-import { Request, Response } from 'express';
-import * as morgan from 'morgan';
+import { config } from './config';
+import { ApplicationFactory } from './ApplicationFactory';
 
-let app = express();
-app.use(morgan('tiny'));
+(async () => {
+    const applicationFactory = new ApplicationFactory();
+    let app = await applicationFactory.createApplication();
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Hello World!');
-});
-
-app.listen(3000, () => {
-    console.log('Front app listening on port 3000!');
-});
+    app.listen(config.port, () => {
+        console.log(`Front app listening on port ${config.port}!`);
+    });
+})();

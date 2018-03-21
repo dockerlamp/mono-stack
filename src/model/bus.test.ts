@@ -5,7 +5,7 @@ import { CommandBus } from './command-bus/CommandBus';
 import { LoginUserHandler } from './command-handler/LoginUserHandler';
 import { LoginUserCommand } from './command/LoginUser';
 import { UserWriteModel } from './write-model/UserWriteModel';
-import { ILoginUser } from './command/ILoginUser';
+import { ILoginUserCommand } from './command/ILoginUserCommand';
 
 describe('CQRS', () => {
     let bus: CommandBus;
@@ -20,13 +20,16 @@ describe('CQRS', () => {
     });
 
     it('sending loginUser command should call saveUser on write model', async () => {
-        let command: ILoginUser = {
+        let command: ILoginUserCommand = {
             name: 'login-user',
             id: uuid.v4(),
             user: {
                 email: 'foo@bar.com',
-                userName: 'John Doe',
-                sessionId: uuid.v4()
+                firstName: 'John',
+                lastName: 'Doe',
+                sessionId: uuid.v4(),
+                provider: 'github',
+                providerUserId: '12ab'
             }
         };
 

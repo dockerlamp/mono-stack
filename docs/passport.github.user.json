@@ -1,0 +1,45 @@
+{
+    "id": "1234",
+    "displayName": "Foo Bar",
+    "username": "foouser",
+    "profileUrl": "https://github.com/foouser",
+    "photos": [
+        {
+            "value": "https://avatars0.githubusercontent.com/"
+        }
+    ],
+    "provider": "github",
+    "_raw": "{\"login\":\"foouser\",\"id\":1234,\"avatar_url\":\"https://avatars0.githubusercontent.com/u/123?v=4\",\"gravatar_id\":\"\",\"url\":\"https://api.github.com/users/foouser\",\"html_url\":\"https://github.com/foouser\",\"followers_url\":\"https://api.github.com/users/foouser/followers\",\"following_url\":\"https://api.github.com/users/foouser/following{/other_user}\",\"gists_url\":\"https://api.github.com/users/foouser/gists{/gist_id}\",\"starred_url\":\"https://api.github.com/users/foouser/starred{/owner}{/repo}\",\"subscriptions_url\":\"https://api.github.com/users/foouser/subscriptions\",\"organizations_url\":\"https://api.github.com/users/foouser/orgs\",\"repos_url\":\"https://api.github.com/users/foouser/repos\",\"events_url\":\"https://api.github.com/users/foouser/events{/privacy}\",\"received_events_url\":\"https://api.github.com/users/foouser/received_events\",\"type\":\"User\",\"site_admin\":false,\"name\":\"Foo Bar\",\"company\":null,\"blog\":\"\",\"location\":\"Poland\",\"email\":null,\"hireable\":null,\"bio\":null,\"public_repos\":1,\"public_gists\":0,\"followers\":0,\"following\":0,\"created_at\":\"2012-04-02T11:39:29Z\",\"updated_at\":\"2018-03-06T01:30:18Z\"}",
+    "_json": {
+        "login": "foouser",
+        "id": 1234,
+        "avatar_url": "https://avatars0.githubusercontent.com/",
+        "gravatar_id": "",
+        "url": "https://api.github.com/users/foo",
+        "html_url": "https://github.com/foouser",
+        "followers_url": "https://api.github.com/users/foouser/followers",
+        "following_url": "https://api.github.com/users/foouser/following{/other_user}",
+        "gists_url": "https://api.github.com/users/foouser/gists{/gist_id}",
+        "starred_url": "https://api.github.com/users/foouser/starred{/owner}{/repo}",
+        "subscriptions_url": "https://api.github.com/users/foouser/subscriptions",
+        "organizations_url": "https://api.github.com/users/foouser/orgs",
+        "repos_url": "https://api.github.com/users/foouser/repos",
+        "events_url": "https://api.github.com/users/foouser/events{/privacy}",
+        "received_events_url": "https://api.github.com/users/foouser/received_events",
+        "type": "User",
+        "site_admin": false,
+        "name": "Foo Bar",
+        "company": null,
+        "blog": "",
+        "location": "Poland",
+        "email": null,
+        "hireable": null,
+        "bio": null,
+        "public_repos": 1,
+        "public_gists": 0,
+        "followers": 0,
+        "following": 0,
+        "created_at": "2012-04-02T11:39:29Z",
+        "updated_at": "2018-03-06T01:30:18Z"
+    }
+}
