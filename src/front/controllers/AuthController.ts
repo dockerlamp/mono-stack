@@ -3,8 +3,10 @@ import * as passport from 'passport';
 import * as strategy from 'passport-github';
 
 import { config } from '../config';
-import { UserRepo } from '../user_repo';
 import { IController } from './IController';
+import { commandBus } from '../../model/command-bus';
+import { ILoginUserCommand } from '../../model/command/ILoginUserCommand';
+import { LoginUserCommand } from '../../model/command/LoginUser';
 
 export class AuthController implements IController {
     public async initMiddlewares(app: Express): Promise<void> {
@@ -19,7 +21,6 @@ export class AuthController implements IController {
     public async initRoutings(app: Express): Promise<void> {
         let providerName = 'github';
         let gitHubStrategy = strategy.Strategy;
-        let userRepo = new UserRepo();
 
         passport.use(new gitHubStrategy(config.oAuthApps.gitHub,
             (accessToken, refreshToken, profile, cb) => {
@@ -39,13 +40,16 @@ export class AuthController implements IController {
 
         app.get(`/login/${providerName}/callback`,
             passport.authenticate(providerName),
-            /* async */(req, res) => {
-                // let userPayload = formatUser(req.session.passport.user)
-                //    commandId: uuid.v4();
-                // await bus.send(UserAuthenticateCommand, userPayload);
-                userRepo.addUser(providerName, req.session.passport.user);
-                let user = userRepo.getUser(providerName, req.session.passport.user.id);
-                req.session.user = user;
+            async (req, res) => {
+                let loginUserCommand = new LoginUserCommand();
+                loginUserCommand.user = {
+                    provider: providerName,
+                    providerUserId: req.session.passport.user.id,
+                    name: req.session.passport.user.username,
+                    sessionId: req.session.id
+                };
+                await commandBus.sendCommand(loginUserCommand);
+                req.session.loginInProgress = true;
                 res.redirect('/');
             });
     }

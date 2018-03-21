@@ -1,25 +1,40 @@
 import { Express } from 'express';
 
 import { IController } from './IController';
+import { userReadModel } from '../../model/command-bus';
+import { GetSessionUser } from '../../model/query/GetSessionUser';
 
 export class RootController implements IController {
     public async initRoutings(app: Express): Promise<void> {
-        app.get('/', (req, res) => {
+        app.get('/', async (req, res) => {
             // Query:
             //    v1 let user = await query.waitGithubUser(req.session.passport.user.id);
-            //    v2  let user = await query.waitForGitHubUser(commandId);
-            //    v3  let user = await query.waitForGitHubUser(session.id);
-            //    if (user) { req.session.user = user; }
+            //    v2 let user = await query.waitForGitHubUser(commandId);
+            //    v3 let user = await query.waitForGitHubUser(session.id); //ok
+
+            if (req.session.loginInProgress) {
+                let getSessionUser = new GetSessionUser(userReadModel);
+                let user = await getSessionUser.query(req.session.id);
+                if (user) {
+                    req.session.user = user;
+                    req.session.loginInProgress = undefined;
+                }
+            }
 
             if (req.session.user) {
-                res.send('Hi, you are logged as ' + req.session.user.firstName);
-                // console.log('logged user', req.session.user, 'session id is', req.sessionID);
+                res.send(
+                    `Hi, you are logged as ${req.session.user.name}, ` +
+                    `<a href="/logout">logout</a>`
+                );
             } else {
-                // res.redirect('/login/github');
-                res.send('Hi, you are anonymous, please <a href="/login/github">sign in</a> with github account');
-                // console.log('anonymous user connected');
+                let displayName = req.session.loginInProgress ? 'login in progress' : 'you are anonymous';
+                res.send(`Hi, ${displayName}, <a href="/login/github">sign in</a> with github account`);
             }
-            // console.log(userRepo.repoStats());
+        });
+
+        app.get('/logout',  (req, res) => {
+            req.session = null;
+            res.redirect('/');
         });
     }
 

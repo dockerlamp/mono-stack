@@ -15,6 +15,7 @@ export class ApplicationFactory {
             secret: 'mono-stack',
             resave: false,
             saveUninitialized: true,
+            unset: 'destroy',
         }));
 
         await this.setupControllers(app);
