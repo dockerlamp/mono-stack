@@ -12,8 +12,7 @@ export class RootController implements IController {
             //    if (user) { req.session.user = user; }
 
             if (req.session.user) {
-                // @TODO tutaj passport nie powinien istniec
-                res.send('Hi, you are logged as ' + req.session.passport.user.username);
+                res.send('Hi, you are logged as ' + req.session.user.firstName);
                 // console.log('logged user', req.session.user, 'session id is', req.sessionID);
             } else {
                 // res.redirect('/login/github');
