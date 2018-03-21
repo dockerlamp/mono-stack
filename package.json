@@ -40,7 +40,7 @@
     "copy-json": "yarn run copyfiles --up 1 ./src/**/*.json ./build/",
     "clean": "yarn run --silent rimraf ./build/*",
     "watch": "yarn run tsc -w | tee compile.log",
-    "lint": "yarn run --silent tslint ./src/**/*.ts",
+    "lint": "yarn run --silent tslint ./src/**/*.ts ./test/**/*.ts",
     "test": "yarn run test-unit",
     "test-unit": "yarn run jest -c ./jest/config.unit.js",
     "test-integration": "yarn run jest -c ./jest/config.integration.js",
