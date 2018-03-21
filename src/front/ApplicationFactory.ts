@@ -13,6 +13,8 @@ export class ApplicationFactory {
         app.use(morgan('tiny'));
         app.use(session({
             secret: 'mono-stack',
+            resave: false,
+            saveUninitialized: true,
         }));
 
         await this.setupControllers(app);
