@@ -9,6 +9,7 @@ export interface IConfig {
             host: string;
         };
     };
+    // @TODO rename to authProvider
     oAuthApps: {
         gitHub: {
             clientID: string;
