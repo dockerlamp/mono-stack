@@ -1,11 +1,14 @@
-version: "2"
+version: "3"
 
 services:
   front-server:
     image: node:8.9.4
     working_dir: /app
-    command: 
-      - "yarn" 
+    command:
+      - "yarn"
       - "run"
-      - "start-front" 
+      - "start-front"
+    restart: unless-stopped
+  redis-session:
+    image: redis:4.0.8
     restart: unless-stopped
