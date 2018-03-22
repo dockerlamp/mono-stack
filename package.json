@@ -46,6 +46,7 @@
     "test-integration": "yarn run jest -c ./jest/config.integration.js",
     "test-all": "yarn run jest -c ./jest/config.all.js",
     "start-front": "node build/front/front.js",
-    "dev-front": "yarn run nodemon -L --delay 2 --watch compile.log build/front/front.js"
+    "dev-front": "yarn run nodemon -L --delay 2 --watch compile.log build/front/front.js",
+    "host-dev-front": "yarn run nodemon --delay 2 --watch ./build/ build/front/front.js"
   }
 }
