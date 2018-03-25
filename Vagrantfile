@@ -28,5 +28,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         # docker
         cd /vagrant/provision/docker && ./install-docker.sh
     shell
-    
+
+    config.vm.provision "shell", privileged: false, run: "always", inline: <<-shell
+        echo "\n---------------------------------------------------------------------------\n"
+        echo "\n192.168.56.131	monostack.vagrant"
+
+    shell
+
 end
