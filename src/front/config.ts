@@ -3,10 +3,17 @@ import rc = require('rc');
 // @TODO definicja domyslnych wartosci, mozliwych kluczy
 export interface IConfig {
     port: number;
+    model: {
+        mongodb: {
+            host: string;
+            port: number;
+            database: string;
+        }
+    };
     session: {
         redis: {
-            port: number;
             host: string;
+            port: number;
         };
     };
     // @TODO rename to authProvider
@@ -21,10 +28,17 @@ export interface IConfig {
 
 let defaultConfig = {
     port: 3000,
+    model: {
+        mongodb: {
+            host: 'mongo-model',
+            port: 27017,
+            database: 'monostack',
+        }
+    },
     session: {
         redis: {
-            port: 6379,
             host: 'redis-session',
+            port: 6379,
         }
     }
 };
