@@ -9,6 +9,12 @@ services:
       - "run"
       - "start-front"
     restart: unless-stopped
+    links:
+      - redis-session
+      - mongo-model
   redis-session:
     image: redis:4.0.8
+    restart: unless-stopped
+  mongo-model:
+    image: mongo:3.6
     restart: unless-stopped
