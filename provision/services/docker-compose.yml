@@ -18,3 +18,7 @@ services:
   mongo-model:
     image: mongo:3.6
     restart: unless-stopped
+    command:
+      - "mongod"
+      - "--smallfiles"
+      - "--quiet"
