@@ -1,14 +1,15 @@
 import rc = require('rc');
 
-// @TODO definicja domyslnych wartosci, mozliwych kluczy
+export interface IMongoConfig {
+    host: string;
+    port: number;
+    database: string;
+    options?: any;
+}
 export interface IConfig {
     port: number;
     model: {
-        mongodb: {
-            host: string;
-            port: number;
-            database: string;
-        }
+        mongodb: IMongoConfig
     };
     session: {
         redis: {
