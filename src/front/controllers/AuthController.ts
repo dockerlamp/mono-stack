@@ -5,8 +5,7 @@ import * as strategy from 'passport-github';
 import { config } from '../config';
 import { IController } from './IController';
 import { commandBus } from '../../model/command-bus';
-import { ILoginUserCommand } from '../../model/command/ILoginUserCommand';
-import { LoginUserCommand } from '../../model/command/LoginUser';
+import { LoginUserCommand } from '../../model/user/command/LoginUser';
 
 export class AuthController implements IController {
     public async initMiddlewares(app: Express): Promise<void> {

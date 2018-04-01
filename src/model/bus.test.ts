@@ -2,43 +2,31 @@ import {} from 'jest';
 import * as uuid from 'uuid';
 
 import { CommandBus } from './command-bus/CommandBus';
-import { LoginUserHandler } from './command-handler/LoginUserHandler';
-import { LoginUserCommand } from './command/LoginUser';
-import { UserWriteModel } from './write-model/UserWriteModel';
-import { ILoginUserCommand } from './command/ILoginUserCommand';
+import { ICommand } from './command-bus/ICommand';
+import { ICommandHandler } from './command-bus/ICommandHandler';
 
-describe('CQRS', () => {
+const COMMAND_NAME = 'test';
+
+describe('Command bus', () => {
     let bus: CommandBus;
-    let writeModel: UserWriteModel;
 
     beforeEach(() => {
-        // configure command bus
         bus = new CommandBus();
-        writeModel = new UserWriteModel();
-        let handler = new LoginUserHandler(writeModel);
-        bus.registerCommandHandler(handler);
     });
 
-    it('sending loginUser command should call saveUser on write model', async () => {
-        let command: ILoginUserCommand = {
-            name: 'login-user',
-            id: uuid.v4(),
-            user: {
-                email: 'foo@bar.com',
-                firstName: 'John',
-                lastName: 'Doe',
-                sessionId: uuid.v4(),
-                provider: 'github',
-                providerUserId: '12ab'
-            }
+    it('should allow to receive sent command', async (done) => {
+        let command: ICommand = {
+            name: COMMAND_NAME,
+            id: uuid.v4()
         };
-
-        let user;
-        jest.spyOn(writeModel, 'saveUser').mockImplementation((userData) => {
-            user = userData;
+        bus.registerCommandHandler({
+            name: COMMAND_NAME,
+            handle: async (receivedCommand: ICommand) => {
+                expect(receivedCommand).toMatchObject(command);
+                done();
+            }
         });
 
         await bus.sendCommand(command);
-        expect(user).toEqual(command.user);
     });
 });

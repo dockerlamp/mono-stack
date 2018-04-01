@@ -2,7 +2,7 @@ import { Express } from 'express';
 
 import { IController } from './IController';
 import { userReadModel } from '../../model/command-bus';
-import { GetSessionUser } from '../../model/query/GetSessionUser';
+import { GetSessionUser } from '../../model/user/query/GetSessionUser';
 
 export class RootController implements IController {
     public async initRoutings(app: Express): Promise<void> {

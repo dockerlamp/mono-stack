@@ -1,6 +1,7 @@
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import { EventEmitter } from 'events';
+
 import { ILoginUser } from '../command/ILoginUser';
 
 interface IProviderIdentifiers {

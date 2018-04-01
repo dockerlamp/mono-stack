@@ -2,12 +2,12 @@ import {} from 'jest';
 import * as uuid from 'uuid';
 
 import { CommandBus } from '../../../src/model/command-bus/CommandBus';
-import { LoginUserHandler } from '../../../src/model/command-handler/LoginUserHandler';
-import { LoginUserCommand } from '../../../src/model/command/LoginUser';
-import { UserWriteModel } from '../../../src/model/write-model/UserWriteModel';
-import { UserReadModel } from '../../../src/model/read-model/UserReadModel';
-import { GetSessionUser } from '../../../src/model/query/GetSessionUser';
-import { ILoginUserCommand } from '../../../src/model/command/ILoginUserCommand';
+import { LoginUserHandler } from '../../../src/model/user/command-handler/LoginUserHandler';
+import { LoginUserCommand } from '../../../src/model/user/command/LoginUser';
+import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
+import { UserReadModel } from '../../../src/model/user/read-model/UserReadModel';
+import { GetSessionUser } from '../../../src/model/user/query/GetSessionUser';
+import { ILoginUserCommand } from '../../../src/model/user/command/ILoginUserCommand';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));

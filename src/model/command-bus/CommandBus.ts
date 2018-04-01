@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 
-import { ICommand } from '../command/ICommand';
-import { ICommandHandler } from '../command-handler/ICommandHandler';
+import { ICommand } from './ICommand';
+import { ICommandHandler } from './ICommandHandler';
 
 export class CommandBus {
     private eventEmitter: EventEmitter;
