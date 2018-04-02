@@ -7,49 +7,66 @@ import { IController } from './IController';
 import { commandBus } from '../../model/command-bus';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 
+const PROVIDER_NAME = 'github';
+
 export class AuthController implements IController {
+    private githubPassport;
+
+    constructor() {
+        this.githubPassport = new passport.Passport();
+    }
+
     public async initMiddlewares(app: Express): Promise<void> {
-        // @TODO passport jako globalny obiekt - czy jest mozliwosc zdefiniowania osobnej
-        // instancji np passAuth = new Passport(...)
-        app.use(passport.initialize());
+        app.use(this.githubPassport.initialize());
         // @TODO do weryfikacji czym jest sesja passport, czy ma jakies powiazanie z sessja expressa
         // czy takie rozwiazanie jest skalowalne (dotyczy loadbalncerow)
-        app.use(passport.session());
+        app.use(this.githubPassport.session());
     }
 
     public async initRoutings(app: Express): Promise<void> {
-        let providerName = 'github';
         let gitHubStrategy = strategy.Strategy;
 
-        passport.use(new gitHubStrategy(config.oAuthApps.gitHub,
+        this.githubPassport.use(new gitHubStrategy(config.oAuthApps.gitHub,
             (accessToken, refreshToken, profile, cb) => {
                 cb(null, profile);
             },
         ));
 
-        passport.serializeUser((user, done) => {
+        this.githubPassport.serializeUser((user, done) => {
             done(null, user);
         });
 
-        passport.deserializeUser((user, done) => {
+        this.githubPassport.deserializeUser((user, done) => {
             done(null, user);
         });
+        const passportAuthenticate = this.githubPassport.authenticate(PROVIDER_NAME);
 
-        app.get(`/login/${providerName}`, passport.authenticate(providerName) );
+        app.get(`/login/${PROVIDER_NAME}`, passportAuthenticate );
 
-        app.get(`/login/${providerName}/callback`,
-            passport.authenticate(providerName),
-            async (req, res) => {
-                let loginUserCommand = new LoginUserCommand();
-                loginUserCommand.user = {
-                    provider: providerName,
-                    providerUserId: req.session.passport.user.id,
-                    name: req.session.passport.user.username,
-                    sessionId: req.session.id
-                };
-                await commandBus.sendCommand(loginUserCommand);
-                req.session.loginInProgress = true;
-                res.redirect('/');
-            });
+        app.get(`/login/${PROVIDER_NAME}/callback`, passportAuthenticate, async (req, res, next) => {
+            this.loginHandler(req, res).catch(next);
+        });
+
+        app.get('/logout', async (req, res, next) => {
+            this.logoutHandler(req, res).catch(next);
+        });
+    }
+
+    private async loginHandler(req, res) {
+        let loginUserCommand = new LoginUserCommand();
+        loginUserCommand.user = {
+            provider: PROVIDER_NAME,
+            providerUserId: req.session.passport.user.id,
+            name: req.session.passport.user.username,
+            sessionId: req.session.id
+        };
+        await commandBus.sendCommand(loginUserCommand);
+        req.session.loginInProgress = true;
+        res.redirect('/');
+    }
+
+    private async logoutHandler(req, res) {
+        req.session = null;
+        res.redirect('/');
     }
 }

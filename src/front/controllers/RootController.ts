@@ -9,10 +9,6 @@ export class RootController implements IController {
         app.get('/', async (req, res, next) => {
             this.rootHandler(req, res).catch(next);
         });
-
-        app.get('/logout', async (req, res, next) => {
-            this.logoutHandler(req, res).catch(next);
-        });
     }
 
     public async initMiddlewares(app: Express): Promise<void> {
@@ -43,10 +39,5 @@ export class RootController implements IController {
             let displayName = req.session.loginInProgress ? 'login in progress' : 'you are anonymous';
             res.send(`Hi, ${displayName}, <a href="/login/github">sign in</a> with github account`);
         }
-    }
-
-    private async logoutHandler(req, res) {
-        req.session = null;
-        res.redirect('/');
     }
 }
