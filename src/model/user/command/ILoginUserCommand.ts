@@ -1,4 +1,4 @@
-import { ICommand } from './ICommand';
+import { ICommand } from '../../command-bus/ICommand';
 import { ILoginUser } from './ILoginUser';
 
 export interface ILoginUserCommand extends ICommand {

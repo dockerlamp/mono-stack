@@ -1,4 +1,4 @@
-import { ICommandHandler } from './ICommandHandler';
+import { ICommandHandler } from '../../command-bus/ICommandHandler';
 import { UserWriteModel } from '../write-model/UserWriteModel';
 import { LoginUserCommand } from '../command/LoginUser';
 import { ILoginUserCommand } from '../command/ILoginUserCommand';
