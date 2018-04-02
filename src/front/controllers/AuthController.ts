@@ -1,19 +1,19 @@
 import { Express } from 'express';
 import * as passport from 'passport';
-import * as strategy from 'passport-github';
+import { Strategy as GithubStrategy } from 'passport-github';
 
 import { config } from '../config';
 import { IController } from './IController';
 import { commandBus } from '../../model/command-bus';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 
-const PROVIDER_NAME = 'github';
+const GITHUB_PROVIDER = 'github';
 
 export class AuthController implements IController {
     private githubPassport;
 
     constructor() {
-        this.githubPassport = new passport.Passport();
+        this.githubPassport = this.getPassport(GITHUB_PROVIDER);
     }
 
     public async initMiddlewares(app: Express): Promise<void> {
@@ -24,26 +24,11 @@ export class AuthController implements IController {
     }
 
     public async initRoutings(app: Express): Promise<void> {
-        let gitHubStrategy = strategy.Strategy;
+        const passportAuthenticate = this.githubPassport.authenticate(GITHUB_PROVIDER);
 
-        this.githubPassport.use(new gitHubStrategy(config.oAuthApps.gitHub,
-            (accessToken, refreshToken, profile, cb) => {
-                cb(null, profile);
-            },
-        ));
+        app.get(`/login/${GITHUB_PROVIDER}`, passportAuthenticate );
 
-        this.githubPassport.serializeUser((user, done) => {
-            done(null, user);
-        });
-
-        this.githubPassport.deserializeUser((user, done) => {
-            done(null, user);
-        });
-        const passportAuthenticate = this.githubPassport.authenticate(PROVIDER_NAME);
-
-        app.get(`/login/${PROVIDER_NAME}`, passportAuthenticate );
-
-        app.get(`/login/${PROVIDER_NAME}/callback`, passportAuthenticate, async (req, res, next) => {
+        app.get(`/login/${GITHUB_PROVIDER}/callback`, passportAuthenticate, async (req, res, next) => {
             this.loginHandler(req, res).catch(next);
         });
 
@@ -55,7 +40,7 @@ export class AuthController implements IController {
     private async loginHandler(req, res) {
         let loginUserCommand = new LoginUserCommand();
         loginUserCommand.user = {
-            provider: PROVIDER_NAME,
+            provider: GITHUB_PROVIDER,
             providerUserId: req.session.passport.user.id,
             name: req.session.passport.user.username,
             sessionId: req.session.id
@@ -68,5 +53,29 @@ export class AuthController implements IController {
     private async logoutHandler(req, res) {
         req.session = null;
         res.redirect('/');
+    }
+
+    private getPassport(providerName: string): any {
+        // @TODO support more providers
+        if (providerName !== GITHUB_PROVIDER) {
+            throw new Error(`Unknown provider ${providerName}`);
+        }
+        let passportInstance = new passport.Passport();
+        let strategyVerifyCallback = (accessToken, refreshToken, profile, cb) => {
+            cb(null, profile);
+        };
+        let strategy = new GithubStrategy(config.oAuthApps.gitHub, strategyVerifyCallback);
+
+        passportInstance.use(strategy);
+
+        passportInstance.serializeUser((user, done) => {
+            done(null, user);
+        });
+
+        passportInstance.deserializeUser((user, done) => {
+            done(null, user);
+        });
+
+        return passportInstance;
     }
 }
