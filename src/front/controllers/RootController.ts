@@ -1,7 +1,7 @@
 import { Express } from 'express';
 
 import { IController } from './IController';
-import { userReadModel } from '../../model/command-bus';
+import { getReadModel } from '../../model/command-bus';
 import { GetSessionUser } from '../../model/user/query/GetSessionUser';
 
 export class RootController implements IController {
@@ -22,6 +22,7 @@ export class RootController implements IController {
         //    v3 let user = await query.waitForGitHubUser(session.id); //ok
 
         if (req.session.loginInProgress) {
+            let userReadModel = await getReadModel();
             let getSessionUser = new GetSessionUser(userReadModel);
             let user = await getSessionUser.query(req.session.id);
             if (user) {
