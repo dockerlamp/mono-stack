@@ -4,7 +4,7 @@ import { Strategy as GithubStrategy } from 'passport-github';
 
 import { config } from '../config';
 import { IController } from './IController';
-import { commandBus } from '../../model/command-bus';
+import { commandBus } from '../../model/command-bus/factory';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 
 const GITHUB_PROVIDER = 'github';

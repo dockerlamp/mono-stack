@@ -1,9 +1,9 @@
 import {} from 'jest';
 import * as uuid from 'uuid';
 
-import { CommandBus } from './command-bus/CommandBus';
-import { ICommand } from './command-bus/ICommand';
-import { ICommandHandler } from './command-bus/ICommandHandler';
+import { CommandBus } from './CommandBus';
+import { ICommand } from './ICommand';
+import { ICommandHandler } from './ICommandHandler';
 
 const COMMAND_NAME = 'test';
 

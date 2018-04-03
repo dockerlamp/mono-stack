@@ -1,7 +1,7 @@
 import { Express } from 'express';
 
 import { IController } from './IController';
-import { getReadModel } from '../../model/command-bus';
+import { getReadModel } from '../../model/command-bus/factory';
 import { GetSessionUser } from '../../model/user/query/GetSessionUser';
 
 export class RootController implements IController {
