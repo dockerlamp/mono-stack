@@ -16,18 +16,14 @@ export class UserWriteModel extends EventEmitter {
         this.model = connection.model('write-user', WriteModelUserSchema);
     }
 
-    public async saveUser(userData: ILoginUser): Promise<void> {
+    public async saveUser(userData: ILoginUser): Promise<IWriteModelUserDocument> {
+        let userWithoutIdentifiers = _.omit(userData, [ 'provider', 'providerUserId', 'sessionId']);
         let user = await this.model.findOneAndUpdate(
             {
                 [`providerIds.${userData.provider}`]: userData.providerUserId,
             },
             {
-                $set: {
-                    email: userData.email,
-                    firstName: userData.firstName,
-                    lastName: userData.lastName,
-                    name: userData.name,
-                },
+                $set: userWithoutIdentifiers,
                 $push: {
                     sessionIds: {
                         $each: [userData.sessionId],
@@ -41,18 +37,13 @@ export class UserWriteModel extends EventEmitter {
             }
         );
         this.emit('updated', user);
+        return user;
+    }
 
-        // );
-        // create();
-        // let user = await this.getUserByProvider(userData.provider, userData.providerUserId);
-        // if (user) {
-        //     await this.updateUser(user.id, userData);
-        //     return user.id;
-        // } else {
-        //     let id = await this.addUser(userData);
-        //     return id;
-        // }
-
+    public async getUser(provider: string, providerUserId: string): Promise<IWriteModelUserDocument> {
+        return await this.model.findOne({
+            [`providerIds.${provider}`]: providerUserId,
+        });
     }
 
     // protected async updateUser(id: string, userData: ILoginUser) {
