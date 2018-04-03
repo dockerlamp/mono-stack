@@ -1,8 +1,6 @@
 import { Express } from 'express';
 
 import { IController } from './IController';
-import { userReadModel } from '../../model/command-bus';
-import { GetSessionUser } from '../../model/user/query/GetSessionUser';
 
 export class ErrorController implements IController {
     public async initRoutings(app: Express): Promise<void> {
