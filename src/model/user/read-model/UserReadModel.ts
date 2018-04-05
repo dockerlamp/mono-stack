@@ -7,7 +7,6 @@ import { UserWriteModel } from '../write-model/UserWriteModel';
  */
 export class UserReadModel extends EventEmitter {
 
-
     constructor(private userWriteModel: UserWriteModel) {
         super();
         this.userWriteModel.on('updated', (user: IWriteModelUser) => {
@@ -24,5 +23,4 @@ export class UserReadModel extends EventEmitter {
     private denormalizeUser(user: IWriteModelUser) {
         // throw new Error('Method not implemented.');
     }
-
 }
