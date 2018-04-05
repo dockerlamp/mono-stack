@@ -43,10 +43,12 @@ export class AuthController implements IController {
             provider: GITHUB_PROVIDER,
             providerUserId: req.session.passport.user.id,
             name: req.session.passport.user.username,
-            sessionId: req.session.id
         };
         await commandBus.sendCommand(loginUserCommand);
-        req.session.loginInProgress = true;
+        req.session.loginInProgress =  {
+            provider: GITHUB_PROVIDER,
+            providerUserId: req.session.passport.user.id,
+        };
         res.redirect('/');
     }
 

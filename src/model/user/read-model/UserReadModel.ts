@@ -1,29 +1,28 @@
 import { EventEmitter } from 'events';
+import { IWriteModelUser } from '../write-model/types';
+import { UserWriteModel } from '../write-model/UserWriteModel';
 
 /**
  * Create read model using write model events
  */
 export class UserReadModel extends EventEmitter {
-    private sessions: {[sessioId: string]: any} = {};
 
-    constructor(private userEmitter: EventEmitter) {
+
+    constructor(private userWriteModel: UserWriteModel) {
         super();
-        let updateSessions = (user) => {
-            // index users by sessionId
-            user.sessionIds.forEach((sessionId) => {
-                let prevValue = this.sessions[sessionId];
-                this.sessions[sessionId] = user;
-                if (prevValue !== user) {
-                    this.emit('session-index-updated', sessionId);
-                }
-            });
-        };
-        this.userEmitter.on('updated', updateSessions);
-        this.userEmitter.on('added', updateSessions);
+        this.userWriteModel.on('updated', (user: IWriteModelUser) => {
+            this.denormalizeUser(user);
+        });
     }
 
-    public async getUserBySessionId(sessionId: string): Promise<any> {
-        return this.sessions[sessionId];
+    // @TODO missing return type
+    public async getUserByProvider(provider: string, providerUserId: string): Promise<any> {
+        // @TODO create real "read model" without dependency of WriteModel
+        return await this.userWriteModel.getUser(provider, providerUserId);
+    }
+
+    private denormalizeUser(user: IWriteModelUser) {
+        // throw new Error('Method not implemented.');
     }
 
 }

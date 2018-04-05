@@ -2,7 +2,7 @@ import { Express } from 'express';
 
 import { IController } from './IController';
 import { getReadModel } from '../../model/command-bus/factory';
-import { GetSessionUser } from '../../model/user/query/GetSessionUser';
+import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 
 export class RootController implements IController {
     public async initRoutings(app: Express): Promise<void> {
@@ -22,9 +22,10 @@ export class RootController implements IController {
         //    v3 let user = await query.waitForGitHubUser(session.id); //ok
 
         if (req.session.loginInProgress) {
+            let {provider, providerUserId} = req.session.loginInProgress;
             let userReadModel = await getReadModel();
-            let getSessionUser = new GetSessionUser(userReadModel);
-            let user = await getSessionUser.query(req.session.id);
+            let getProviderUser = new GetProviderUser(userReadModel);
+            let user = await getProviderUser.query(provider, providerUserId);
             if (user) {
                 req.session.user = user;
                 req.session.loginInProgress = undefined;
@@ -37,7 +38,9 @@ export class RootController implements IController {
                 `<a href="/logout">logout</a>`
             );
         } else {
-            let displayName = req.session.loginInProgress ? 'login in progress' : 'you are anonymous';
+            let displayName = req.session.loginInProgress ?
+                `${req.session.loginInProgress.provider} login in progress` :
+                'you are anonymous';
             res.send(`Hi, ${displayName}, <a href="/login/github">sign in</a> with github account`);
         }
     }

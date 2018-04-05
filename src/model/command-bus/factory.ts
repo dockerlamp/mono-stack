@@ -9,13 +9,9 @@ import { config } from '../../front/config';
 export const commandBus = new CommandBus();
 
 let getWriteModel = async (): Promise<UserWriteModel> => {
-    console.log('1');
     let connection = await MongoFactory.getConnection(config.model.mongodb);
-    console.log('2');
     const userWriteModel = new UserWriteModel(connection);
-    console.log('3');
     commandBus.registerCommandHandler(new LoginUserHandler(userWriteModel));
-    console.log('4');
     return userWriteModel;
 };
 
