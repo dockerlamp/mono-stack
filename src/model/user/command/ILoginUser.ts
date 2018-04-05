@@ -1,5 +1,4 @@
 export interface ILoginUser {
-    sessionId: string;
     provider: string;
     providerUserId: string;
     email?: string;

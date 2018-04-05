@@ -7,7 +7,6 @@ import { ILoginUser } from '../command/ILoginUser';
 import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from './types';
 
 export class UserWriteModel extends EventEmitter {
-    // private users: IWriteModelUser[] = [];
     private model: Model<IWriteModelUserDocument>;
 
     constructor( private connection: Connection ) {
@@ -17,26 +16,21 @@ export class UserWriteModel extends EventEmitter {
     }
 
     public async saveUser(userData: ILoginUser): Promise<IWriteModelUserDocument> {
-        let userWithoutIdentifiers = _.omit(userData, [ 'provider', 'providerUserId', 'sessionId']);
+        let userWithoutIdentifiers = _.omit(userData, [ 'provider', 'providerUserId' ]);
         let user = await this.model.findOneAndUpdate(
             {
                 [`providerIds.${userData.provider}`]: userData.providerUserId,
             },
             {
                 $set: userWithoutIdentifiers,
-                $push: {
-                    sessionIds: {
-                        $each: [userData.sessionId],
-                        $position: 0,
-                        $slice: 5
-                    }
-                }
             },
             {
                 upsert: true,
+                new: true,
             }
         );
         this.emit('updated', user);
+
         return user;
     }
 
@@ -45,47 +39,5 @@ export class UserWriteModel extends EventEmitter {
             [`providerIds.${provider}`]: providerUserId,
         });
     }
-
-    // protected async updateUser(id: string, userData: ILoginUser) {
-    //     let user = await this.getUserById(id);
-    //     user.name = userData.name;
-    //     user.firstName = userData.firstName;
-    //     user.lastName = userData.lastName;
-    //     user.email = userData.email;
-    //     user.providerIds[userData.provider] = userData.providerUserId;
-    //     user.sessionIds.push(userData.sessionId);
-    //     user.sessionIds = _.uniq(user.sessionIds);
-
-    //     this.emit('updated', user);
-    // }
-
-    // protected async addUser(userData: ILoginUser): Promise<string> {
-    //     let id = uuid.v4();
-    //     let user: IWriteModelUser = {
-    //         id: id,
-    //         email: userData.email,
-    //         firstName: userData.firstName,
-    //         lastName: userData.lastName,
-    //         name: userData.name,
-    //         providerIds: {
-    //             [userData.provider]: userData.providerUserId
-    //         },
-    //         sessionIds: [ userData.sessionId ]
-    //     };
-    //     this.users.push(user);
-    //     this.emit('added', user);
-
-    //     return id;
-    // }
-
-    // protected async getUserByProvider(provider: string, providerUserId: string): Promise<IWriteModelUser> {
-    //     return _.find(this.users, (user) => {
-    //         return user.providerIds[provider] === providerUserId;
-    //     });
-    // }
-
-    // protected async getUserById(id: string): Promise<IWriteModelUser> {
-    //     return _.find(this.users, {id});
-    // }
 
 }
