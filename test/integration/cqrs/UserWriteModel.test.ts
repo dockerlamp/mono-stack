@@ -5,7 +5,8 @@ import * as _ from 'lodash';
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
 import { config } from '../../../src/front/config';
-import { ILoginUser } from '../../model/user/command/ILoginUser';
+import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
+import { EventBus } from '../../../src/model/command-bus/EventBus';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));
@@ -24,6 +25,7 @@ let user: ILoginUser = {
 
 describe('CQRS - UserWriteModel', () => {
     let connection: Connection;
+    let eventBus: EventBus;
     let writeModel: UserWriteModel;
 
     let deleteAll = async () => {
@@ -34,10 +36,11 @@ describe('CQRS - UserWriteModel', () => {
         let mongoConfig = _.cloneDeep(config.model.mongodb);
         mongoConfig.database = TEST_DB;
         connection = await MongoFactory.getConnection(mongoConfig);
+        eventBus = new EventBus();
     });
 
     beforeEach(async () => {
-        writeModel = new UserWriteModel(connection);
+        writeModel = new UserWriteModel(connection, eventBus);
         await deleteAll();
     });
 
