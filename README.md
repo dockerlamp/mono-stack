@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/dockerlamp/mono-stack.svg?branch=develop)](https://travis-ci.org/dockerlamp/mono-stack)
 # Config
 
 ## Dependencies
