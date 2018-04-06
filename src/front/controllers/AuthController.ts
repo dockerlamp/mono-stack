@@ -39,7 +39,7 @@ export class AuthController implements IController {
 
     private async loginHandler(req, res) {
         let loginUserCommand = new LoginUserCommand();
-        loginUserCommand.user = {
+        loginUserCommand.payload = {
             provider: GITHUB_PROVIDER,
             providerUserId: req.session.passport.user.id,
             name: req.session.passport.user.username,

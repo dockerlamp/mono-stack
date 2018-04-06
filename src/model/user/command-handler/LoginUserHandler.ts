@@ -10,6 +10,6 @@ export class LoginUserHandler implements ICommandHandler {
     }
 
     public async handle(command: ILoginUserCommand) {
-        await this.userModel.saveUser(command.user);
+        await this.userModel.saveUser(command.payload);
     }
 }
