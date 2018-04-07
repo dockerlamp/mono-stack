@@ -11,11 +11,14 @@ export class CommandBus {
     }
 
     public async sendCommand(command: ICommand) {
+        console.log(`Sending command ${command.name}/${command.id}`);
         this.eventEmitter.emit(command.name, command);
     }
 
     public registerCommandHandler(handler: ICommandHandler) {
+        console.log(`Regiserd command ${handler.name}`);
         this.eventEmitter.on(handler.name, async (command: ICommand) => {
+            console.log(`Handling command ${command.name}/${command.id}`);
             await handler.handle(command);
         });
     }

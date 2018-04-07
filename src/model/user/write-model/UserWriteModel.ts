@@ -18,6 +18,7 @@ export class UserWriteModel extends EventEmitter {
     }
 
     public async saveUser(userData: ILoginUser): Promise<IWriteModelUserDocument> {
+        console.log('Saving user', userData);
         let userWithoutIdentifiers = _.omit(userData, [ 'provider', 'providerUserId' ]);
         let user = await this.model.findOneAndUpdate(
             {
