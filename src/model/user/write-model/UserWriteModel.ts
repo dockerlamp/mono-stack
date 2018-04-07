@@ -39,10 +39,14 @@ export class UserWriteModel {
         return user;
     }
 
-    public async getUser(provider: string, providerUserId: string): Promise<IWriteModelUserDocument> {
+    public async getUserByProvider(provider: string, providerUserId: string): Promise<IWriteModelUserDocument> {
         return await this.model.findOne({
             [`providerIds.${provider}`]: providerUserId,
         });
+    }
+
+    public async getUseByEmail(email: string): Promise<IWriteModelUserDocument> {
+        return await this.model.findOne({ email });
     }
 
 }

@@ -10,6 +10,21 @@ export class LoginUserHandler implements ICommandHandler {
     }
 
     public async handle(command: ILoginUserCommand) {
-        await this.userModel.saveUser(command.payload);
+        // get user by provider id
+        let {provider, providerUserId, email} = command.payload;
+        let user = await this.userModel.getUserByProvider(provider, providerUserId);
+        if (!user && email) {
+            // get user by email
+            user = await this.userModel.getUseByEmail(email);
+        }
+        if (user) {
+            // if exist then update only fields which does nod exists in user
+            let updateData = {};
+            // ...compare
+            user.save();
+        } else {
+            // if doesnt exists add new user
+            await this.userModel.saveUser(command.payload);
+        }
     }
 }

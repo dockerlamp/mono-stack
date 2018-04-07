@@ -7,6 +7,7 @@ import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteMod
 import { config } from '../../../src/front/config';
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
 import { EventBus } from '../../../src/model/command-bus/EventBus';
+import { IWriteModelUserDocument } from '../../model/user/write-model/types';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));
@@ -44,23 +45,29 @@ describe('CQRS - UserWriteModel', () => {
         await deleteAll();
     });
 
+    let expectDbUserEqualsLoginUser = (dbUser: IWriteModelUserDocument) => {
+        expect(dbUser.email).toEqual(user.email);
+        expect(dbUser.name).toEqual(user.name);
+        expect(dbUser.firstName).toEqual(user.firstName);
+        expect(dbUser.lastName).toEqual(user.lastName);
+        expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
+    }
+
     it('should save new user', async () => {
         let dbUser = await writeModel.saveUser(user);
-        expect(dbUser.email).toEqual(user.email);
-        expect(dbUser.name).toEqual(user.name);
-        expect(dbUser.firstName).toEqual(user.firstName);
-        expect(dbUser.lastName).toEqual(user.lastName);
-        expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
+        expectDbUserEqualsLoginUser(dbUser);
     });
 
-    it('should get existing user', async () => {
+    it('should get existing user by provider', async () => {
         await writeModel.saveUser(user);
-        let dbUser = await writeModel.getUser(user.provider, user.providerUserId);
-        expect(dbUser.email).toEqual(user.email);
-        expect(dbUser.name).toEqual(user.name);
-        expect(dbUser.firstName).toEqual(user.firstName);
-        expect(dbUser.lastName).toEqual(user.lastName);
-        expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
+        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        expectDbUserEqualsLoginUser(dbUser);
+    });
+
+    it('should get existing user by email', async () => {
+        await writeModel.saveUser(user);
+        let dbUser = await writeModel.getUseByEmail(user.email);
+        expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should update existing user', async () => {
