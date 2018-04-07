@@ -8,12 +8,10 @@ import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from '
 import { EventBus } from '../../command-bus/EventBus';
 
 const USER_COLLECTION = 'write-user';
-export class UserWriteModel extends EventEmitter {
+export class UserWriteModel {
     private model: Model<IWriteModelUserDocument>;
 
     constructor( private connection: Connection, private eventBus: EventBus ) {
-        super();
-
         this.model = connection.model(USER_COLLECTION, WriteModelUserSchema);
     }
 
@@ -32,10 +30,10 @@ export class UserWriteModel extends EventEmitter {
                 new: true,
             }
         );
-        this.emit('updated', user);
         this.eventBus.publish({
             id: uuid.v4(),
             name: 'write-user-updated',
+            payload: user,
         });
 
         return user;
