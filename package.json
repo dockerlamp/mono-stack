@@ -51,6 +51,7 @@
     "test-unit": "yarn run jest -c ./jest/config.unit.js",
     "test-integration": "yarn run jest -c ./jest/config.integration.js",
     "test-all": "yarn run jest -c ./jest/config.all.js",
+    "test-all-coverage": "yarn run test-all --coverage --coverageReporters=lcov --silent",
     "start-front": "node build/src/front/front.js",
     "dev-front": "yarn run nodemon -L --delay 2 --watch compile.log build/src/front/front.js",
     "host-dev-front": "yarn run nodemon --delay 2 --watch ./build/ build/src/front/front.js"
