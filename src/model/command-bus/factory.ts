@@ -16,13 +16,10 @@ let getWriteModel = async (): Promise<UserWriteModel> => {
     commandBus.registerCommandHandler(new LoginUserHandler(userWriteModel));
     return userWriteModel;
 };
+export const writeModel: Promise<UserWriteModel> = getWriteModel();
 
-let getReadModelCache = null;
-export const getReadModel = async () => {
-    if (!getReadModelCache) {
-
-        let userWriteModel = await getWriteModel();
-        getReadModelCache = new UserReadModel(userWriteModel);
-    }
-    return getReadModelCache;
+let getReadModel = async (): Promise<UserReadModel> => {
+    let userWriteModel = await writeModel;
+    return new UserReadModel(userWriteModel);
 };
+export const readModel: Promise<UserReadModel> = getReadModel();
