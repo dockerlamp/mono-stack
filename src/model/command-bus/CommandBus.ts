@@ -17,6 +17,10 @@ export class CommandBus {
 
     public registerCommandHandler(handler: ICommandHandler) {
         console.log(`Regiserd command ${handler.name}`);
+        if (this.eventEmitter.listenerCount(handler.name) > 0 ) {
+            throw new Error(
+                `CommandBus based on event emitter allows only one hander "${handler.name}"`);
+        }
         this.eventEmitter.on(handler.name, async (command: ICommand) => {
             console.log(`Handling command ${command.name}/${command.id}`);
             await handler.handle(command);
