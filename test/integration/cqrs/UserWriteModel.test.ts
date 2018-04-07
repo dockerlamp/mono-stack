@@ -51,7 +51,7 @@ describe('CQRS - UserWriteModel', () => {
         expect(dbUser.firstName).toEqual(user.firstName);
         expect(dbUser.lastName).toEqual(user.lastName);
         expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
-    }
+    };
 
     it('should save new user', async () => {
         let dbUser = await writeModel.saveUser(user);
