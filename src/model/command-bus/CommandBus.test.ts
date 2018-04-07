@@ -30,7 +30,7 @@ describe('Command bus', () => {
         await bus.sendCommand(command);
     });
 
-    it('should throw error when adding second handler th same type', async () => {
+    it('should throw error when adding second handler the same type', async () => {
         bus.registerCommandHandler({ name: COMMAND_NAME,
             handle: async () => {
                 // first handler
