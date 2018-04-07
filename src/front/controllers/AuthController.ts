@@ -1,13 +1,31 @@
 import { Express } from 'express';
 import * as passport from 'passport';
+import * as _ from 'lodash';
 import { Strategy as GithubStrategy } from 'passport-github';
 
 import { config } from '../config';
 import { IController } from './IController';
 import { commandBus } from '../../model/command-bus/factory';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
+import { ILoginUser } from '../../model/user/command/ILoginUser';
 
 const GITHUB_PROVIDER = 'github';
+
+interface IGithubProfile {
+    id: string;
+    displayName: string;
+    username: string;
+    profileUrl: string;
+    photos: [{
+        value: string;
+    }];
+    provider: string;
+    emails: [{
+        value: string;
+        primary: boolean;
+        verified: boolean;
+    }];
+}
 
 export class AuthController implements IController {
     private githubPassport;
@@ -38,17 +56,10 @@ export class AuthController implements IController {
     }
 
     private async loginHandler(req, res) {
-        let loginUserCommand = new LoginUserCommand();
-        loginUserCommand.payload = {
-            provider: GITHUB_PROVIDER,
-            providerUserId: req.session.passport.user.id,
-            name: req.session.passport.user.username,
-        };
-        await commandBus.sendCommand(loginUserCommand);
-        req.session.loginInProgress =  {
-            provider: GITHUB_PROVIDER,
-            providerUserId: req.session.passport.user.id,
-        };
+        // req.session.loginInProgress =  {
+        //     provider: GITHUB_PROVIDER,
+        //     providerUserId: req.session.passport.user.id,
+        // };
         res.redirect('/');
     }
 
@@ -63,21 +74,52 @@ export class AuthController implements IController {
             throw new Error(`Unknown provider ${providerName}`);
         }
         let passportInstance = new passport.Passport();
-        let strategyVerifyCallback = (accessToken, refreshToken, profile, cb) => {
-            cb(null, profile);
+        let strategyVerifyCallback = (accessToken, refreshToken, profile: IGithubProfile, cb) => {
+            this.saveGithubUserProfile(profile)
+                .then((user) => cb( null, user ))
+                .catch((err) => cb( err ));
+            // // save received profile as system user
+            // console.log('strategyVerifyCallback', profile);
+            // // let
+            // cb(null, _.omit(profile, '_raw', '_json'));
         };
-        let strategy = new GithubStrategy(config.oAuthApps.gitHub, strategyVerifyCallback);
+        let strategyOptions = _.merge(config.oAuthApps.gitHub, {
+            scope: [ 'user:email' ]
+        });
+        let strategy = new GithubStrategy(strategyOptions, strategyVerifyCallback);
 
         passportInstance.use(strategy);
 
         passportInstance.serializeUser((user, done) => {
+            // serializeUser determines, which data of the user object should be stored in the session
+            console.log('serialize', user);
             done(null, user);
         });
 
         passportInstance.deserializeUser((user, done) => {
+            // deserialize serialized user to store in req.user field
+            console.log('deserialize', user);
             done(null, user);
         });
 
         return passportInstance;
+    }
+
+    private async saveGithubUserProfile(profile: IGithubProfile): Promise<ILoginUser> {
+        let user: ILoginUser = {
+            provider: GITHUB_PROVIDER,
+            providerUserId: profile.id,
+            // @TODO send display name and all emails
+            email: _.get(profile, 'emails[0].value'),
+            name: profile.username,
+        };
+        let loginUserCommand = new LoginUserCommand();
+        loginUserCommand.payload = user;
+        // send async command and dont wait to complete
+        commandBus.sendCommand(loginUserCommand)
+            .then(() => console.log('Command sent'))
+            .catch((err) => console.error(err));
+
+        return user;
     }
 }
