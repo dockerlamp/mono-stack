@@ -4,5 +4,6 @@ export interface ILoginUser {
     email?: string;
     firstName?: string;
     lastName?: string;
-    name?: string;
+    userName?: string;
+    displayName?: string;
 }

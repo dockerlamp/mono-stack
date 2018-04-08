@@ -17,10 +17,10 @@ const TEST_DB = 'monostack-test';
 
 let user: ILoginUser = {
     email: 'foo@bar.com',
-    name: 'foobar',
+    userName: 'foobar',
     firstName: 'foo',
     lastName: 'bar',
-    provider: 'foo-provider',
+    provider: 'github',
     providerUserId: 'foo-id'
 };
 
@@ -47,7 +47,7 @@ describe('CQRS - UserWriteModel', () => {
 
     let expectDbUserEqualsLoginUser = (dbUser: IWriteModelUserDocument) => {
         expect(dbUser.email).toEqual(user.email);
-        expect(dbUser.name).toEqual(user.name);
+        expect(dbUser.userName).toEqual(user.userName);
         expect(dbUser.firstName).toEqual(user.firstName);
         expect(dbUser.lastName).toEqual(user.lastName);
         expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
@@ -73,13 +73,13 @@ describe('CQRS - UserWriteModel', () => {
     it('should update existing user', async () => {
         await writeModel.saveUser(user);
         let updatedUser: ILoginUser = {
-            provider: 'foo-provider',
-            providerUserId: 'foo-id',
-            name: 'foo bar',
+            provider: user.provider,
+            providerUserId: user.providerUserId,
+            userName: 'foo bar',
         };
         let dbUser = await writeModel.saveUser(updatedUser);
         expect(dbUser.email).toEqual(user.email);
-        expect(dbUser.name).toEqual(updatedUser.name);
+        expect(dbUser.userName).toEqual(updatedUser.userName);
     });
 
     afterEach(async () => {

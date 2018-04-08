@@ -5,9 +5,12 @@ export interface IWriteModelUser {
     email?: string;
     firstName?: string;
     lastName?: string;
-    name?: string;
+    displayName?: string;
+    userName?: string;
     providerIds: {
         github: string;
+        facebook: string;
+        google: string;
     };
 }
 
@@ -18,10 +21,11 @@ export const WriteModelUserSchema = new Schema({
     email: String,
     firstName: String,
     lastName: String,
-    name: String,
+    displayName: String,
+    userName: String,
     providerIds: {
-        type: {
-            github: String,
-        }
+        github: String,
+        facebook: String,
+        google: String,
     }
 });

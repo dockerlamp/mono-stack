@@ -111,7 +111,7 @@ export class AuthController implements IController {
             providerUserId: profile.id,
             // @TODO send display name and all emails
             email: _.get(profile, 'emails[0].value'),
-            name: profile.username,
+            userName: profile.username,
         };
         let loginUserCommand = new LoginUserCommand();
         loginUserCommand.payload = user;
