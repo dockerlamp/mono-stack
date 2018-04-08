@@ -16,6 +16,23 @@ let user: ILoginUser = {
     userName: 'foobar',
     firstName: 'foo',
     lastName: 'bar',
+    displayName: 'Foo Bar',
+    provider: 'github',
+    providerUserId: 'foo-id'
+};
+
+let userWithEmptyDataFields: ILoginUser = {
+    email: 'foo@bar.com',
+    provider: 'github',
+    providerUserId: 'foo-id'
+};
+
+let userWithChangedAllDatafields: ILoginUser = {
+    email: 'foo@bar.com',
+    userName: 'foobar-changed',
+    firstName: 'foo-changed',
+    lastName: 'bar-changed',
+    displayName: 'Foo Bar-changed',
     provider: 'github',
     providerUserId: 'foo-id'
 };
@@ -25,6 +42,7 @@ let userFromOtherProvider: ILoginUser = {
     userName: 'foobar',
     firstName: 'foo',
     lastName: 'bar',
+    displayName: 'Foo Bar',
     provider: 'google',
     providerUserId: 'bar-id'
 };
@@ -102,6 +120,53 @@ describe('CQRS - LoginUserHandler', () => {
         expect(dbUser2.id).toEqual(dbUser.id);
         expect(dbUser2.providerIds[user.provider]).toEqual(user.providerUserId);
         expect(dbUser2.providerIds[userFromOtherProvider.provider]).toEqual(userFromOtherProvider.providerUserId);
+    });
+
+    it('second login should not change defined fields from existing user', async () => {
+        await loginUserHandler.handle({
+            id: 'id',
+            name: 'name',
+            payload: user
+        });
+        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+
+        await loginUserHandler.handle({
+            id: 'id',
+            name: 'name',
+            payload: userWithChangedAllDatafields
+        });
+        let dbUser2 = await writeModel.getUserByProvider(
+            userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
+        expect(dbUser2).not.toBeNull();
+        expect(dbUser2.id).toEqual(dbUser.id);
+        expect(dbUser2.firstName).toEqual(user.firstName);
+        expect(dbUser2.lastName).toEqual(user.lastName);
+        expect(dbUser2.userName).toEqual(user.userName);
+        expect(dbUser2.displayName).toEqual(user.displayName);
+    });
+
+    it('second login should change undefined fields from existing user', async () => {
+        await loginUserHandler.handle({
+            id: 'id',
+            name: 'name',
+            payload: userWithEmptyDataFields
+        });
+        let dbUser = await writeModel.getUserByProvider(
+            userWithEmptyDataFields.provider, userWithEmptyDataFields.providerUserId);
+
+        await loginUserHandler.handle({
+            id: 'id',
+            name: 'name',
+            payload: userWithChangedAllDatafields
+        });
+        let dbUser2 = await writeModel.getUserByProvider(
+            userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
+        expect(dbUser2).not.toBeNull();
+        expect(dbUser2.id).toEqual(dbUser.id);
+        expect(dbUser2.firstName).toEqual(userWithChangedAllDatafields.firstName);
+        expect(dbUser2.lastName).toEqual(userWithChangedAllDatafields.lastName);
+        expect(dbUser2.userName).toEqual(userWithChangedAllDatafields.userName);
+        expect(dbUser2.displayName).toEqual(userWithChangedAllDatafields.displayName);
     });
 
     afterEach(async () => {
