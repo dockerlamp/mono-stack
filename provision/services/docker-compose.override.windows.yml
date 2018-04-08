@@ -17,8 +17,20 @@ services:
       - redissessiondata:/data
     ports:
       - 6379:6379
+  mongo-model:
+    environment:
+      - MONGO_DATA_DIR=/data/db
+      - MONGO_LOG_DIR=/dev/null
+    command: mongod --smallfiles
+    volumes:
+      - mongo-model-config:/data/configdb
+      - mongo-model-data:/data/db
+    ports:
+      - 27017:27017
 
 volumes:
   node-modules:
   node-cache:
   redissessiondata:
+  mongo-model-config:
+  mongo-model-data:

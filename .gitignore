@@ -3,5 +3,6 @@
 /.vagrant/
 /.vscode/
 /build/
+/coverage/
 /compile.log
 /node_modules/

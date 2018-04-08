@@ -6,7 +6,7 @@ import { ILoginUser } from './ILoginUser';
 export class LoginUserCommand implements ILoginUserCommand {
     public name: string = 'login-user';
     public id: string;
-    public user: ILoginUser;
+    public payload: ILoginUser;
 
     constructor() {
         this.id = uuid.v4();

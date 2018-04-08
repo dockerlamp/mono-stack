@@ -10,6 +10,7 @@
     "express-session": "^1.15.6",
     "ioredis": "^3.2.2",
     "lodash": "^4.17.5",
+    "mongoose": "^5.0.12",
     "morgan": "^1.9.0",
     "passport": "^0.4.0",
     "passport-github": "^1.1.0",
@@ -22,6 +23,7 @@
     "@types/rc":"^0.0.1",
     "@types/passport": "^0.4.3",
     "@types/passport-github": "^1.1.2",
+    "@types/mongoose": "^5.0.7",
     "@types/morgan": "^1.7.35",
     "@types/lodash": "^4.14.105",
     "@types/uuid": "^3.4.3",
@@ -41,7 +43,7 @@
   },
   "scripts": {
     "build": "yarn run clean & yarn run copy-json & yarn run tsc | tee compile.log",
-    "copy-json": "yarn run copyfiles --up 1 ./src/**/*.json ./build/",
+    "copy-json": "yarn run copyfiles --up 1 ./src/**/*.json ./build/src",
     "clean": "yarn run --silent rimraf ./build/*",
     "watch": "yarn run tsc -w | tee compile.log",
     "lint": "yarn run --silent tslint ./src/**/*.ts ./test/**/*.ts",
@@ -49,8 +51,9 @@
     "test-unit": "yarn run jest -c ./jest/config.unit.js",
     "test-integration": "yarn run jest -c ./jest/config.integration.js",
     "test-all": "yarn run jest -c ./jest/config.all.js",
-    "start-front": "node build/front/front.js",
-    "dev-front": "yarn run nodemon -L --delay 2 --watch compile.log build/front/front.js",
-    "host-dev-front": "yarn run nodemon --delay 2 --watch ./build/ build/front/front.js"
+    "test-all-coverage": "yarn run test-all --coverage --coverageReporters=lcov --silent",
+    "start-front": "node build/src/front/front.js",
+    "dev-front": "yarn run nodemon -L --delay 2 --watch compile.log build/src/front/front.js",
+    "host-dev-front": "yarn run nodemon --delay 2 --watch ./build/ build/src/front/front.js"
   }
 }

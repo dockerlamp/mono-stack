@@ -1,7 +1,7 @@
 import { EventEmitter } from 'events';
 
-import { ICommand } from '../command/ICommand';
-import { ICommandHandler } from '../command-handler/ICommandHandler';
+import { ICommand } from './ICommand';
+import { ICommandHandler } from './ICommandHandler';
 
 export class CommandBus {
     private eventEmitter: EventEmitter;
@@ -11,11 +11,18 @@ export class CommandBus {
     }
 
     public async sendCommand(command: ICommand) {
+        console.log(`Sending command ${command.name}/${command.id}`);
         this.eventEmitter.emit(command.name, command);
     }
 
     public registerCommandHandler(handler: ICommandHandler) {
+        console.log(`Regiserd command ${handler.name}`);
+        if (this.eventEmitter.listenerCount(handler.name) > 0 ) {
+            throw new Error(
+                `CommandBus based on event emitter allows only one hander "${handler.name}"`);
+        }
         this.eventEmitter.on(handler.name, async (command: ICommand) => {
+            console.log(`Handling command ${command.name}/${command.id}`);
             await handler.handle(command);
         });
     }

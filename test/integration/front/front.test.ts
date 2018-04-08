@@ -12,10 +12,11 @@ describe('Express application', () => {
         expressApplication = await applicationFactory.createApplication();
     });
 
-    it('get / shoure return status 200', (done) => {
-        request(expressApplication)
+    it('get / shoure return status 200', async () => {
+        await request(expressApplication)
             .get('/')
-            .expect(200, done)
-            .expect(/anonymous/);
+            .timeout(1000)
+            .expect(/anonymous/)
+            .expect(200);
     });
 });

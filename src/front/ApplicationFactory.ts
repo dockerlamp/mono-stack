@@ -6,10 +6,11 @@ import * as connectRedis from 'connect-redis';
 import { RedisStoreOptions } from 'connect-redis';
 import * as Redis from 'ioredis';
 
-import { AuthController } from './controllers/AuthController';
+import { config } from './config';
 import { IController } from './controllers/IController';
 import { RootController } from './controllers/RootController';
-import { config } from './config';
+import { AuthController } from './controllers/AuthController';
+import { ErrorController } from './controllers/ErrorController';
 
 /* tslint:disable-next-line:variable-name */
 const RedisStore = connectRedis(session);
@@ -19,6 +20,13 @@ export class ApplicationFactory {
         let app = express();
         app.use(morgan('tiny'));
         app.use(this.getSessionMiddleware());
+        app.use((req, res, next) => {
+            if (!req.session) {
+                next(new Error('Can not work without session!'));
+                return;
+            }
+            next();
+        });
 
         await this.setupControllers(app);
 
@@ -47,6 +55,7 @@ export class ApplicationFactory {
         return [
             new RootController(),
             new AuthController(),
+            new ErrorController(),
         ];
     }
 
