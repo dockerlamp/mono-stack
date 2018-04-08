@@ -19,9 +19,15 @@ export class LoginUserHandler implements ICommandHandler {
         }
         if (user) {
             // if exist then update only fields which does nod exists in user
-            let updateData = {};
             // ...compare
-            user.save();
+            if (!user.providerIds[provider]) {
+                user.providerIds[provider] = providerUserId;
+            }
+            // let updateData = {};
+            // let compareFields = [];
+            if (user.isModified) {
+                await user.save();
+            }
         } else {
             // if doesnt exists add new user
             await this.userModel.saveUser(command.payload);
