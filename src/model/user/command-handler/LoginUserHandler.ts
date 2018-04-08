@@ -26,7 +26,7 @@ export class LoginUserHandler implements ICommandHandler {
             await this.updateUser(user, command.payload);
         } else {
             // if doesnt exists add new user
-            await this.userModel.saveUser(command.payload);
+            await this.userModel.insertUser(command.payload);
         }
     }
 

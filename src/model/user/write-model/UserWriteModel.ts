@@ -6,35 +6,31 @@ import { Connection, Model } from 'mongoose';
 import { ILoginUser } from '../command/ILoginUser';
 import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from './types';
 import { EventBus } from '../../command-bus/EventBus';
+import { IUserWrite } from './IUserWrite';
+import { IUserRead } from './IUserRead';
 
 const USER_COLLECTION = 'write-user';
-export class UserWriteModel {
+export class UserWriteModel implements IUserWrite, IUserRead {
     private model: Model<IWriteModelUserDocument>;
 
     constructor( private connection: Connection, private eventBus: EventBus ) {
         this.model = connection.model(USER_COLLECTION, WriteModelUserSchema);
+        // let that = this;
+        this.model.schema.post('save', function() {
+            console.log('post save', this.toObject());
+            eventBus.publish({
+                id: uuid.v4(),
+                name: 'write-user-updated',
+                payload: this,
+            });
+        });
     }
 
-    public async saveUser(userData: ILoginUser): Promise<IWriteModelUserDocument> {
+    public async insertUser(userData: ILoginUser): Promise<IWriteModelUserDocument> {
         console.log('Saving user', userData);
-        let userWithoutIdentifiers = _.omit(userData, [ 'provider', 'providerUserId' ]);
-        let user = await this.model.findOneAndUpdate(
-            {
-                [`providerIds.${userData.provider}`]: userData.providerUserId,
-            },
-            {
-                $set: userWithoutIdentifiers,
-            },
-            {
-                upsert: true,
-                new: true,
-            }
-        );
-        this.eventBus.publish({
-            id: uuid.v4(),
-            name: 'write-user-updated',
-            payload: user,
-        });
+        let writeModelUser = _.omit(userData, [ 'provider', 'providerUserId' ]) as IWriteModelUser;
+        _.set(writeModelUser, ['providerIds', userData.provider], userData.providerUserId);
+        let user = await this.model.create(writeModelUser);
 
         return user;
     }

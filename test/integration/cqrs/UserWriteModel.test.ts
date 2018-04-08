@@ -7,7 +7,7 @@ import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteMod
 import { config } from '../../../src/front/config';
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
 import { EventBus } from '../../../src/model/command-bus/EventBus';
-import { IWriteModelUserDocument } from '../../model/user/write-model/types';
+import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/write-model/types';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));
@@ -54,32 +54,32 @@ describe('CQRS - UserWriteModel', () => {
     };
 
     it('should save new user', async () => {
-        let dbUser = await writeModel.saveUser(user);
+        let dbUser = await writeModel.insertUser(user);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should get existing user by provider', async () => {
-        await writeModel.saveUser(user);
+        await writeModel.insertUser(user);
         let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should get existing user by email', async () => {
-        await writeModel.saveUser(user);
+        await writeModel.insertUser(user);
         let dbUser = await writeModel.getUseByEmail(user.email);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should update existing user', async () => {
-        await writeModel.saveUser(user);
-        let updatedUser: ILoginUser = {
-            provider: user.provider,
-            providerUserId: user.providerUserId,
+        let insertedUser = await writeModel.insertUser(user);
+        let updatedUserData = {
             userName: 'foo bar',
         };
-        let dbUser = await writeModel.saveUser(updatedUser);
-        expect(dbUser.email).toEqual(user.email);
-        expect(dbUser.userName).toEqual(updatedUser.userName);
+        insertedUser.set(updatedUserData);
+        await insertedUser.save();
+        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        expect(dbUser.id).toEqual(insertedUser.id);
+        expect(dbUser.userName).toEqual(updatedUserData.userName);
     });
 
     afterEach(async () => {
