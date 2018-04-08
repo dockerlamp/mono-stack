@@ -5,7 +5,8 @@ import { Strategy as GithubStrategy } from 'passport-github';
 
 import { config } from '../config';
 import { IController } from './IController';
-import { commandBus } from '../../model/command-bus/factory';
+import { commandBus, readModel } from '../../model/command-bus/factory';
+import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 import { ILoginUser } from '../../model/user/command/ILoginUser';
 
@@ -56,10 +57,6 @@ export class AuthController implements IController {
     }
 
     private async loginHandler(req, res) {
-        // req.session.loginInProgress =  {
-        //     provider: GITHUB_PROVIDER,
-        //     providerUserId: req.session.passport.user.id,
-        // };
         res.redirect('/');
     }
 
@@ -76,12 +73,8 @@ export class AuthController implements IController {
         let passportInstance = new passport.Passport();
         let strategyVerifyCallback = (accessToken, refreshToken, profile: IGithubProfile, cb) => {
             this.saveGithubUserProfile(profile)
-                .then((user) => cb( null, user ))
+                .then((user: ILoginUser) => cb( null, user ))
                 .catch((err) => cb( err ));
-            // // save received profile as system user
-            // console.log('strategyVerifyCallback', profile);
-            // // let
-            // cb(null, _.omit(profile, '_raw', '_json'));
         };
         let strategyOptions = _.merge(config.oAuthApps.gitHub, {
             scope: [ 'user:email' ]
@@ -90,16 +83,20 @@ export class AuthController implements IController {
 
         passportInstance.use(strategy);
 
-        passportInstance.serializeUser((user, done) => {
-            // serializeUser determines, which data of the user object should be stored in the session
-            console.log('serialize', user);
+        passportInstance.serializeUser((user: ILoginUser, done) => {
+            // serializeUser determines, which data of the user object should be stored in the session.passport.user
             done(null, user);
         });
 
-        passportInstance.deserializeUser((user, done) => {
+        passportInstance.deserializeUser(async (user: ILoginUser, done) => {
             // deserialize serialized user to store in req.user field
-            console.log('deserialize', user);
-            done(null, user);
+            try {
+                let getProviderUser = new GetProviderUser(await readModel);
+                let modelUser = await getProviderUser.query(user.provider, user.providerUserId);
+                done(null, modelUser);
+            } catch (err) {
+                done(err);
+            }
         });
 
         return passportInstance;
@@ -109,9 +106,10 @@ export class AuthController implements IController {
         let user: ILoginUser = {
             provider: GITHUB_PROVIDER,
             providerUserId: profile.id,
-            // @TODO send display name and all emails
+            // @TODO send all emails
             email: _.get(profile, 'emails[0].value'),
             userName: profile.username,
+            displayName: profile.displayName,
         };
         let loginUserCommand = new LoginUserCommand();
         loginUserCommand.payload = user;

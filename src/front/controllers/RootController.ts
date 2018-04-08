@@ -20,27 +20,16 @@ export class RootController implements IController {
         //    v2 let user = await query.waitForGitHubUser(commandId);
         //    v3 let user = await query.waitForGitHubUser(session.id); //ok
 
-        // if (req.session.loginInProgress) {
-        //     let {provider, providerUserId} = req.session.loginInProgress;
-        //     let userReadModel = await getReadModel();
-        //     let getProviderUser = new GetProviderUser(userReadModel);
-        //     let user = await getProviderUser.query(provider, providerUserId);
-        //     if (user) {
-        //         req.session.user = user;
-        //         req.session.loginInProgress = undefined;
-        //     }
-        // }
-
         if (req.user) {
             res.send(
-                `Hi, you are logged as ${req.user.name}, ` +
+                `Hi, you are logged as ${req.user.userName}/${req.user.displayName}, ` +
                 `<a href="/logout">logout</a>`
             );
         } else {
-            let displayName = _.get(req, 'session.passport.user', false) ?
+            let loginMessage = _.get(req, 'session.passport.user', false) ?
                 `login in progress` :
                 'you are anonymous';
-            res.send(`Hi, ${displayName}, <a href="/login/github">sign in</a> with github account`);
+            res.send(`Hi, ${loginMessage}, <a href="/login/github">sign in</a> with github account`);
         }
     }
 }
