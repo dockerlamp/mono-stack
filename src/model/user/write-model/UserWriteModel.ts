@@ -15,9 +15,7 @@ export class UserWriteModel implements IUserWrite, IUserRead {
 
     constructor( private connection: Connection, private eventBus: EventBus ) {
         this.model = connection.model(USER_COLLECTION, WriteModelUserSchema);
-        // let that = this;
         this.model.schema.post('save', function() {
-            console.log('post save', this.toObject());
             eventBus.publish({
                 id: uuid.v4(),
                 name: 'write-user-updated',

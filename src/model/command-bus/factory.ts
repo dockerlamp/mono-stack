@@ -19,6 +19,6 @@ let getWriteModel = async (): Promise<UserWriteModel> => {
 export const writeModel: Promise<UserWriteModel> = getWriteModel();
 
 let getReadModel = async (): Promise<UserReadModel> => {
-    return new UserReadModel(eventBus);
+    return new UserReadModel(eventBus, await writeModel);
 };
 export const readModel: Promise<UserReadModel> = getReadModel();

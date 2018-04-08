@@ -1,6 +1,6 @@
-import { IWriteModelUserDocument } from './types';
+import { IWriteModelUser } from './types';
 
 export interface IUserRead {
-    getUserByProvider(provider: string, providerUserId: string): Promise<IWriteModelUserDocument>;
-    getUseByEmail(email: string): Promise<IWriteModelUserDocument>
+    getUserByProvider(provider: string, providerUserId: string): Promise<IWriteModelUser>;
+    getUseByEmail(email: string): Promise<IWriteModelUser>;
 }
