@@ -12,11 +12,34 @@ describe('Express application', () => {
         expressApplication = await applicationFactory.createApplication();
     });
 
-    it('get / shoure return status 200', async () => {
+    it('get / should return status 200', async () => {
         await request(expressApplication)
             .get('/')
             .timeout(1000)
             .expect(/anonymous/)
             .expect(200);
+    });
+
+    it('get /login/[unknown-provider] should return 404', async () => {
+        await request(expressApplication)
+            .get('/login/foobar')
+            .timeout(1000)
+            .expect(404);
+    });
+
+    it('get /login/github should redirects to hithub', async () => {
+        await request(expressApplication)
+            .get('/login/github')
+            .timeout(1000)
+            .expect(302)
+            .expect('location', /https.*github\.com/);
+    });
+
+    it('get /logout should redirect to /', async () => {
+        await request(expressApplication)
+            .get('/logout')
+            .timeout(1000)
+            .expect(302)
+            .expect('location', '/');
     });
 });

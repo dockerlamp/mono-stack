@@ -29,27 +29,31 @@ interface IGithubProfile {
 }
 
 export class AuthController implements IController {
-    private githubPassport;
+    private passport;
+    private passportStrategyProviders: string[];
 
     constructor() {
-        this.githubPassport = this.getPassport(GITHUB_PROVIDER);
+        this.passportStrategyProviders = [ GITHUB_PROVIDER ];
+        this.passport = this.getPassport();
     }
 
     public async initMiddlewares(app: Express): Promise<void> {
-        app.use(this.githubPassport.initialize());
+        app.use(this.passport.initialize());
         // @TODO do weryfikacji czym jest sesja passport, czy ma jakies powiazanie z sessja expressa
         // czy takie rozwiazanie jest skalowalne (dotyczy loadbalncerow)
-        app.use(this.githubPassport.session());
+        app.use(this.passport.session());
     }
 
     public async initRoutings(app: Express): Promise<void> {
-        const passportAuthenticate = this.githubPassport.authenticate(GITHUB_PROVIDER);
+        for ( let providerName of this.passportStrategyProviders) {
+            const passportAuthenticate = this.passport.authenticate(providerName);
 
-        app.get(`/login/${GITHUB_PROVIDER}`, passportAuthenticate );
+            app.get(`/login/${providerName}`, passportAuthenticate );
 
-        app.get(`/login/${GITHUB_PROVIDER}/callback`, passportAuthenticate, async (req, res, next) => {
-            this.loginHandler(req, res).catch(next);
-        });
+            app.get(`/login/${providerName}/callback`, passportAuthenticate, async (req, res, next) => {
+                this.loginHandler(req, res).catch(next);
+            });
+        }
 
         app.get('/logout', async (req, res, next) => {
             this.logoutHandler(req, res).catch(next);
@@ -65,12 +69,7 @@ export class AuthController implements IController {
         res.redirect('/');
     }
 
-    private getPassport(providerName: string): any {
-        // @TODO support more providers
-        if (providerName !== GITHUB_PROVIDER) {
-            throw new Error(`Unknown provider ${providerName}`);
-        }
-        let passportInstance = new passport.Passport();
+    private getGithubStrategy(): passport.Strategy {
         let strategyVerifyCallback = (accessToken, refreshToken, profile: IGithubProfile, cb) => {
             this.saveGithubUserProfile(profile)
                 .then((user: ILoginUser) => cb( null, user ))
@@ -81,7 +80,24 @@ export class AuthController implements IController {
         });
         let strategy = new GithubStrategy(strategyOptions, strategyVerifyCallback);
 
-        passportInstance.use(strategy);
+        return strategy;
+    }
+
+    private setupPassportStrategies(passportInstance) {
+        for ( let providerName of this.passportStrategyProviders) {
+            switch (providerName) {
+                case GITHUB_PROVIDER:
+                    passportInstance.use(this.getGithubStrategy());
+                    break;
+                default:
+                    throw new Error(`Unknown passport provider ${providerName}`);
+            }
+        }
+    }
+
+    private getPassport(): any {
+        let passportInstance = new passport.Passport();
+        this.setupPassportStrategies(passportInstance);
 
         passportInstance.serializeUser((user: ILoginUser, done) => {
             // serializeUser determines, which data of the user object should be stored in the session.passport.user
