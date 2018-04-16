@@ -15,17 +15,13 @@ export class RootController implements IController {
     }
 
     private async rootHandler(req, res) {
-        // Query:
-        //    v1 let user = await query.waitGithubUser(req.session.passport.user.id);
-        //    v2 let user = await query.waitForGitHubUser(commandId);
-        //    v3 let user = await query.waitForGitHubUser(session.id); //ok
-
         if (req.user) {
             res.send(
                 `Hi, you are logged as ${req.user.userName}/${req.user.displayName}, ` +
                 `<a href="/logout">logout</a>`
             );
         } else {
+            // @TODO remove passport dependency
             let loginMessage = _.get(req, 'session.passport.user', false) ?
                 `login in progress` :
                 'you are anonymous';

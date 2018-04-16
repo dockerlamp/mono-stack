@@ -4,20 +4,12 @@ import * as request from 'supertest';
 
 import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
 
-describe('Express application', () => {
+describe('AuthController', () => {
     let expressApplication: Express;
 
     beforeEach(async () => {
         let applicationFactory = new ApplicationFactory();
         expressApplication = await applicationFactory.createApplication();
-    });
-
-    it('get / should return status 200', async () => {
-        await request(expressApplication)
-            .get('/')
-            .timeout(1000)
-            .expect(/anonymous/)
-            .expect(200);
     });
 
     it('get /login/[unknown-provider] should return 404', async () => {
