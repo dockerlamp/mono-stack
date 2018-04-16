@@ -16,8 +16,10 @@ import { ErrorController } from './controllers/ErrorController';
 const RedisStore = connectRedis(session);
 
 export class ApplicationFactory {
-    public async createApplication(): Promise<Express> {
-        let app = express();
+    public async createApplication(app?: Express): Promise<Express> {
+        if (!app) {
+            app = express();
+        }
         app.use(morgan('tiny'));
         app.use(this.getSessionMiddleware());
         app.use((req, res, next) => {
