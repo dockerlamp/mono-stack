@@ -45,6 +45,16 @@ You can create file `.env` in services folder to setup some enviromental variabl
 COMPOSE_PROJECT_NAME=monostack
 ```
 
+## Application config
+
+Database configuration is ready for docker development but when there is cross-machine configuration you can use `.monostackrc` file or setup via environmetal variables:
+
+```cmd
+set monostack_model__mongodb__host=monostack.vagrant
+set monostack_session__redis__host=monostack.vagrant
+```
+
 # UI
 
 http://localhost:3000 or http://monostack.vagrant:3000
+

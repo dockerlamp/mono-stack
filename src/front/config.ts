@@ -43,7 +43,14 @@ let defaultConfig = {
             host: 'redis-session',
             port: 6379,
         }
-    }
+    },
+    oAuthApps: {
+        gitHub: {
+            clientID: 'string',
+            clientSecret: 'string',
+            callbackURL: 'http://127.0.0.1:3000/login/github/callback',
+        },
+    },
 };
 
 export let config: IConfig = rc('monostack', defaultConfig);
