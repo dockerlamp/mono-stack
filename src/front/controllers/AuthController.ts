@@ -71,6 +71,8 @@ export class AuthController implements IController {
 
     private getGithubStrategy(): passport.Strategy {
         let strategyVerifyCallback = (accessToken, refreshToken, profile: IGithubProfile, cb) => {
+            // f(profile): ILoggedUser -> serialize
+            // CQRS command
             this.saveGithubUserProfile(profile)
                 .then((user: ILoginUser) => cb( null, user ))
                 .catch((err) => cb( err ));
@@ -101,13 +103,19 @@ export class AuthController implements IController {
 
         passportInstance.serializeUser((user: ILoginUser, done) => {
             // serializeUser determines, which data of the user object should be stored in the session.passport.user
+            // user -> session.passport.user
             done(null, user);
         });
 
         passportInstance.deserializeUser(async (user: ILoginUser, done) => {
             // deserialize serialized user to store in req.user field
+            // session.passport.user -> req.user
             try {
+                // CQRS: query
                 let getProviderUser = new GetProviderUser(await readModel);
+                // @TODO: wait for user ...
+                // - repeat/query/sleep
+                // - eventbus.subscribe(...)
                 let modelUser = await getProviderUser.query(user.provider, user.providerUserId);
                 done(null, modelUser);
             } catch (err) {
