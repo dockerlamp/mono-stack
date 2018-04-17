@@ -13,5 +13,5 @@ services:
 before_script:
   - sleep 20
 script:
-  - yarn test-all-coverage
+  - yarn test-all-coverage --silent
   - yarn lint
