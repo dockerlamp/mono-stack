@@ -3,6 +3,15 @@ node_js:
   - "lts/*"
 cache:
   yarn: true
+env:
+  global:
+    - monostack_model__mongodb__host=127.0.0.1
+    - monostack_session__redis__host=localhost
+services:
+  - mongodb
+  - redis-server
+before_script:
+  - sleep 20
 script:
-  - yarn test --silent --coverage --coverageReporters=json
+  - yarn test-all-coverage --silent
   - yarn lint
