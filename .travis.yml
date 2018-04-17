@@ -4,8 +4,9 @@ node_js:
 cache:
   yarn: true
 env:
-  - monostack_model__mongodb__host=127.0.0.1
-  - monostack_session__redis__host=localhost
+  global:
+    - monostack_model__mongodb__host=127.0.0.1
+    - monostack_session__redis__host=localhost
 services:
   - mongodb
   - redis-server
