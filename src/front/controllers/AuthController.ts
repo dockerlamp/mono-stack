@@ -77,7 +77,7 @@ export class AuthController implements IController {
                 .then((user: ILoginUser) => cb( null, user ))
                 .catch((err) => cb( err ));
         };
-        let strategyOptions = _.merge(config.oAuthApps.gitHub, {
+        let strategyOptions = _.merge(config.authProvider.gitHub, {
             scope: [ 'user:email' ]
         });
         let strategy = new GithubStrategy(strategyOptions, strategyVerifyCallback);

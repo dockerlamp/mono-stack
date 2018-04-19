@@ -19,8 +19,7 @@ export interface IConfig {
             port: number;
         };
     };
-    // @TODO rename to authProvider
-    oAuthApps: {
+    authProvider: {
         gitHub: {
             clientID: string;
             clientSecret: string;
@@ -44,7 +43,7 @@ let defaultConfig = {
             port: 6379,
         }
     },
-    oAuthApps: {
+    authProvider: {
         gitHub: {
             clientID: 'string',
             clientSecret: 'string',
