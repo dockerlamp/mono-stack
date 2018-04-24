@@ -1,7 +1,10 @@
 import rc = require('rc');
+
 import { IFrontConfig } from './IFrontConfig';
 
-let defaultConfig = {
+const FRONT_APPLICATION_NAME = 'monostack';
+
+let defaultConfig: IFrontConfig = {
     port: 3000,
     model: {
         mongodb: {
@@ -25,4 +28,4 @@ let defaultConfig = {
     },
 };
 
-export let config: IFrontConfig = rc('monostack', defaultConfig);
+export let config: IFrontConfig = rc(FRONT_APPLICATION_NAME, defaultConfig);
