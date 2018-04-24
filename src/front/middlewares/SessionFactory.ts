@@ -18,7 +18,7 @@ export class SessionFactory {
             port: config.session.redis.port,
             host: config.session.redis.host
         });
-        let redisConfig: RedisStoreOptions = {
+        let redisStoreOptions: RedisStoreOptions = {
             client: redisClient
         };
 
@@ -27,7 +27,7 @@ export class SessionFactory {
             resave: false,
             saveUninitialized: true,
             unset: 'destroy',
-            store: new RedisStore({client: redisClient}),
+            store: new RedisStore(redisStoreOptions),
         });
     }
 }
