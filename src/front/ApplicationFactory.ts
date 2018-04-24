@@ -1,10 +1,9 @@
 import 'reflect-metadata';
-import {Service, Container} from 'typedi';
+import { Service } from 'typedi';
 import { Express } from 'express';
 import * as express from 'express';
 import * as morgan from 'morgan';
 
-import { config } from './config';
 import { IController } from './controllers/IController';
 import { RootController } from './controllers/RootController';
 import { AuthController } from './controllers/AuthController';
@@ -14,7 +13,10 @@ import { SessionFactory } from './middlewares/SessionFactory';
 @Service()
 export class ApplicationFactory {
     constructor(
-        private sessionFactory: SessionFactory
+        private sessionFactory: SessionFactory,
+        private rootController: RootController,
+        private authController: AuthController,
+        private errorController: ErrorController,
     ) {}
 
     public async createApplication(app?: Express): Promise<Express> {
@@ -38,9 +40,9 @@ export class ApplicationFactory {
 
     private getControllers(): IController[] {
         return [
-            new RootController(),
-            new AuthController(),
-            new ErrorController(),
+            this.rootController,
+            this.authController,
+            this.errorController,
         ];
     }
 

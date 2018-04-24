@@ -1,14 +1,15 @@
+import { Service } from 'typedi';
 import { Express } from 'express';
 import * as passport from 'passport';
 import * as _ from 'lodash';
 import { Strategy as GithubStrategy } from 'passport-github';
 
-import { config } from '../config';
 import { IController } from './IController';
 import { commandBus, readModel } from '../../model/command-bus/factory';
 import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 import { ILoginUser } from '../../model/user/command/ILoginUser';
+import { FrontConfigProvider } from '../config/FrontConfigProvider';
 
 const GITHUB_PROVIDER = 'github';
 
@@ -28,11 +29,14 @@ interface IGithubProfile {
     }];
 }
 
+@Service()
 export class AuthController implements IController {
     private passport;
     private passportStrategyProviders: string[];
 
-    constructor() {
+    constructor(
+        private frontConfigProvider: FrontConfigProvider
+    ) {
         this.passportStrategyProviders = [ GITHUB_PROVIDER ];
         this.passport = this.getPassport();
     }
@@ -77,6 +81,7 @@ export class AuthController implements IController {
                 .then((user: ILoginUser) => cb( null, user ))
                 .catch((err) => cb( err ));
         };
+        let config = this.frontConfigProvider.getConfig();
         let strategyOptions = _.merge(config.authProvider.gitHub, {
             scope: [ 'user:email' ]
         });

@@ -1,7 +1,9 @@
+import { Service } from 'typedi';
 import { Express } from 'express';
 
 import { IController } from './IController';
 
+@Service()
 export class ErrorController implements IController {
     public async initRoutings(app: Express): Promise<void> {
         app.use((err, req, res, next) => {
