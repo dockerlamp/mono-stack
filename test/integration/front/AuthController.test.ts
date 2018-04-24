@@ -1,6 +1,7 @@
 import {} from 'jest';
 import { Express } from 'express';
 import * as request from 'supertest';
+import Container from 'typedi';
 
 import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
 
@@ -8,7 +9,7 @@ describe('AuthController', () => {
     let expressApplication: Express;
 
     beforeEach(async () => {
-        let applicationFactory = new ApplicationFactory();
+        let applicationFactory = Container.get(ApplicationFactory);
         expressApplication = await applicationFactory.createApplication();
     });
 
