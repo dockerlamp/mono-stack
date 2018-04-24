@@ -13,7 +13,9 @@
         "moduleResolution": "node",
         "outDir": "build",
         "skipLibCheck": true,
-        "target": "es6"
+        "target": "es6",
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true
     },
 
     "include": [
