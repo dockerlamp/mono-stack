@@ -4,7 +4,7 @@ import { Connection } from 'mongoose';
 import { IMongoConfig } from '../../common/config/IMongoConfig';
 
 export class MongoFactory {
-    public static async getConnection(config: IMongoConfig): Promise<Connection> {
+    public static getConnection(config: IMongoConfig): Connection {
         let connection = mongoose.createConnection(MongoFactory.getConnectionUri(config) , config.options);
         return connection;
     }

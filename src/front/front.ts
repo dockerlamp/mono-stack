@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import {Container} from 'typedi';
+import { Container } from 'typedi';
 
 import { ApplicationFactory } from './ApplicationFactory';
 import { FrontConfigProvider } from './config/FrontConfigProvider';

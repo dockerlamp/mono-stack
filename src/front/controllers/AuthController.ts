@@ -5,11 +5,12 @@ import * as _ from 'lodash';
 import { Strategy as GithubStrategy } from 'passport-github';
 
 import { IController } from './IController';
-import { commandBus, readModel } from '../../model/command-bus/factory';
+import { readModel } from '../../model/command-bus/factory';
 import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 import { ILoginUser } from '../../model/user/command/ILoginUser';
 import { FrontConfigProvider } from '../config/FrontConfigProvider';
+import { CommandBus } from '../../model/command-bus/CommandBus';
 
 const GITHUB_PROVIDER = 'github';
 
@@ -35,7 +36,8 @@ export class AuthController implements IController {
     private passportStrategyProviders: string[];
 
     constructor(
-        private frontConfigProvider: FrontConfigProvider
+        private frontConfigProvider: FrontConfigProvider,
+        private commandBus: CommandBus,
     ) {
         this.passportStrategyProviders = [ GITHUB_PROVIDER ];
         this.passport = this.getPassport();
@@ -143,7 +145,7 @@ export class AuthController implements IController {
         let loginUserCommand = new LoginUserCommand();
         loginUserCommand.payload = user;
         // send async command and dont wait to complete
-        commandBus.sendCommand(loginUserCommand)
+        this.commandBus.sendCommand(loginUserCommand)
             .then(() => console.log('Command sent'))
             .catch((err) => console.error(err));
 

@@ -1,3 +1,4 @@
+import { Service } from 'typedi';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import { EventEmitter } from 'events';
@@ -8,8 +9,11 @@ import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from '
 import { EventBus } from '../../command-bus/EventBus';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
+import { UserWriteModelFactory } from './UserWriteModelFactory';
 
 const USER_COLLECTION = 'write-user';
+
+@Service({ factory: [UserWriteModelFactory, 'create']})
 export class UserWriteModel implements IUserWrite, IUserRead {
     private model: Model<IWriteModelUserDocument>;
 

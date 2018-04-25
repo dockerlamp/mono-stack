@@ -11,7 +11,7 @@ export const commandBus = new CommandBus();
 export const eventBus = new EventBus();
 
 let getWriteModel = async (): Promise<UserWriteModel> => {
-    let connection = await MongoFactory.getConnection(config.model.mongodb);
+    let connection = MongoFactory.getConnection(config.model.mongodb);
     const userWriteModel = new UserWriteModel(connection, eventBus);
     commandBus.registerCommandHandler(new LoginUserHandler(userWriteModel));
     return userWriteModel;
