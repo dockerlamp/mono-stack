@@ -1,13 +1,16 @@
+import 'reflect-metadata';
+import { Container } from 'typedi';
 import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
-import { config } from '../../../src/front/config';
+
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
-import { EventBus } from '../../../src/model/command-bus/EventBus';
 import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/write-model/types';
+import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
+import { MongoConnection } from '../../../src/model/db/MongoConnection';
 
 function delay(milis: number): Promise<any> {
     return new Promise((resolve) => setTimeout(resolve, milis));
@@ -26,7 +29,6 @@ let user: ILoginUser = {
 
 describe('CQRS - UserWriteModel', () => {
     let connection: Connection;
-    let eventBus: EventBus;
     let writeModel: UserWriteModel;
 
     let deleteAll = async () => {
@@ -34,14 +36,21 @@ describe('CQRS - UserWriteModel', () => {
     };
 
     beforeAll(async () => {
-        let mongoConfig = _.cloneDeep(config.model.mongodb);
-        mongoConfig.database = TEST_DB;
-        connection = await MongoFactory.getConnection(mongoConfig);
-        eventBus = new EventBus();
+        let mockContainerId = {id: 'CQRS - UserWriteModel'};
+        // @TODO extract test database helper
+        let config = Container.get(FrontConfigProvider).getConfig();
+
+        let testConfig = _.cloneDeep(config);
+        testConfig.model.mongodb.database = TEST_DB;
+        Container.of(mockContainerId).set(FrontConfigProvider, {
+            getConfig: () => testConfig
+        });
+        writeModel = Container.of(mockContainerId).get(UserWriteModel);
+        connection = Container.of(mockContainerId).get(MongoConnection).getConnection();
+        Container.of(mockContainerId).reset();
     });
 
     beforeEach(async () => {
-        writeModel = new UserWriteModel(connection, eventBus);
         await deleteAll();
     });
 
