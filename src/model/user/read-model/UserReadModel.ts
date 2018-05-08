@@ -1,13 +1,16 @@
+import { Service } from 'typedi';
+
 import { IWriteModelUser } from '../write-model/types';
 import { EventBus } from '../../command-bus/EventBus';
 import { ICommand } from '../../command-bus/ICommand';
 import { IUserRead } from '../write-model/IUserRead';
+import { UserReadModelFactory } from './UserReadModelFactory';
 
 /**
  * Create read model using write model events
  */
+@Service({ factory: [UserReadModelFactory, 'create']})
 export class UserReadModel {
-
     constructor(private eventBus: EventBus, private userRead: IUserRead) {
         eventBus.subscribe( {
             name: 'write-user-updated',

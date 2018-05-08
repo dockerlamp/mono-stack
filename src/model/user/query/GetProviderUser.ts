@@ -1,5 +1,8 @@
+import { Service } from 'typedi';
+
 import { UserReadModel } from '../read-model/UserReadModel';
 
+@Service()
 export class GetProviderUser {
     constructor(private readModel: UserReadModel) {
     }

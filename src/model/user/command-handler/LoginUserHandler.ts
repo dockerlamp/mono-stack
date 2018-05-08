@@ -15,7 +15,7 @@ export class LoginUserHandler implements ICommandHandler {
     constructor(private userModel: UserWriteModel) {
     }
 
-    public async handle(command: ILoginUserCommand) {
+    public async handle(command: ILoginUserCommand): Promise<void> {
         let {provider, providerUserId, email} = command.payload;
         // get user by provider id
         let user = await this.userModel.getUserByProvider(provider, providerUserId);

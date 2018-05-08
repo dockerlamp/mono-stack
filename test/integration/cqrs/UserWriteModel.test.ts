@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import { Container } from 'typedi';
 import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';
@@ -11,12 +10,7 @@ import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
 import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/write-model/types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
-
-function delay(milis: number): Promise<any> {
-    return new Promise((resolve) => setTimeout(resolve, milis));
-}
-
-const TEST_DB = 'monostack-test';
+import { getTestDbContainer } from '../helpers/getTestDbContainer';
 
 let user: ILoginUser = {
     email: 'foo@bar.com',
@@ -36,18 +30,10 @@ describe('CQRS - UserWriteModel', () => {
     };
 
     beforeAll(async () => {
-        let mockContainerId = {id: 'CQRS - UserWriteModel'};
-        // @TODO extract test database helper
-        let config = Container.get(FrontConfigProvider).getConfig();
-
-        let testConfig = _.cloneDeep(config);
-        testConfig.model.mongodb.database = TEST_DB;
-        Container.of(mockContainerId).set(FrontConfigProvider, {
-            getConfig: () => testConfig
-        });
-        writeModel = Container.of(mockContainerId).get(UserWriteModel);
-        connection = Container.of(mockContainerId).get(MongoConnection).getConnection();
-        Container.of(mockContainerId).reset();
+        let testDbContainer = getTestDbContainer();
+        writeModel = testDbContainer.get(UserWriteModel);
+        connection = testDbContainer.get(MongoConnection).getConnection();
+        testDbContainer.reset();
     });
 
     beforeEach(async () => {

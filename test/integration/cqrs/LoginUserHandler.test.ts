@@ -1,13 +1,16 @@
+import 'reflect-metadata';
 import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
-import { config } from '../../../src/front/config';
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
 import { EventBus } from '../../../src/model/command-bus/EventBus';
 import { LoginUserHandler } from '../../../src/model/user/command-handler/LoginUserHandler';
+import { getTestDbContainer } from '../helpers/getTestDbContainer';
+import { delay } from '../helpers/delay';
+import { MongoConnection } from '../../../src/model/db/MongoConnection';
 
 const TEST_DB = 'monostack-test';
 
@@ -51,21 +54,20 @@ describe('CQRS - LoginUserHandler', () => {
     let connection: Connection;
     let writeModel: UserWriteModel;
     let loginUserHandler: LoginUserHandler;
+    let testDbContainer;
 
     let deleteAll = async () => {
-        await connection.collection('write-users').deleteMany({});
+        let result = await connection.collection('write-users').deleteMany({});
     };
 
     beforeAll(async () => {
-        let mongoConfig = _.cloneDeep(config.model.mongodb);
-        mongoConfig.database = TEST_DB;
-        connection = await MongoFactory.getConnection(mongoConfig);
+        testDbContainer = getTestDbContainer();
+        writeModel = testDbContainer.get(UserWriteModel);
+        loginUserHandler = testDbContainer.get(LoginUserHandler);
+        connection = testDbContainer.get(MongoConnection).getConnection();
     });
 
     beforeEach(async () => {
-        let eventBus = new EventBus();
-        writeModel = new UserWriteModel(connection, eventBus);
-        loginUserHandler = new LoginUserHandler(writeModel);
         await deleteAll();
     });
 
@@ -77,6 +79,7 @@ describe('CQRS - LoginUserHandler', () => {
         });
 
         let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        expect(dbUser).not.toBeNull();
         expect(dbUser.email).toEqual(user.email);
         expect(dbUser.userName).toEqual(user.userName);
         expect(dbUser.firstName).toEqual(user.firstName);
@@ -170,11 +173,12 @@ describe('CQRS - LoginUserHandler', () => {
     });
 
     afterEach(async () => {
-        // await deleteAll();
+        await deleteAll();
     });
 
     afterAll(async () => {
-        connection.close();
+        await connection.close();
+        testDbContainer.reset();
     });
 
 });
