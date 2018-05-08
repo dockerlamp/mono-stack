@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';

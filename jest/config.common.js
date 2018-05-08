@@ -22,5 +22,8 @@ module.exports = {
         '^/node_modules/',
         // ignore coverage for interface files
         '/I[A-Z].*',
+    ],
+    setupFiles: [
+        './test/typedi-bootstrap.js'
     ]
 };

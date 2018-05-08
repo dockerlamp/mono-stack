@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Service } from 'typedi';
 import { Express } from 'express';
 import * as express from 'express';

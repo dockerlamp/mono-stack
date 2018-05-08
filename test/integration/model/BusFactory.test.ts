@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import Container from 'typedi';
 import {} from 'jest';
 

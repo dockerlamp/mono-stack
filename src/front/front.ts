@@ -1,3 +1,4 @@
+// reflect-metadata is required for typedi module
 import 'reflect-metadata';
 import { Container } from 'typedi';
 

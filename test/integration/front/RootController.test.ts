@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import {} from 'jest';
 import { Express } from 'express';
 import * as express from 'express';

@@ -1,4 +1,3 @@
-import 'reflect-metadata';
 import { Container, ContainerInstance } from 'typedi';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
