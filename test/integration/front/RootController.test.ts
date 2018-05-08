@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import Container from 'typedi';
 
 import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
-import { IWriteModelUser } from '../../model/user/write-model/types';
+import { IWriteModelUser } from '../../model/user/model/types';
 
 describe('RootControoler', () => {
     let expressApplication: Express;

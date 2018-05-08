@@ -9,12 +9,12 @@ import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from '
 import { EventBus } from '../../command-bus/EventBus';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
-import { UserWriteModelFactory } from './UserWriteModelFactory';
+import { UserWriteModelFactory } from './UserModelFactory';
 
-const USER_COLLECTION = 'write-user';
+const USER_COLLECTION = 'user';
 
 @Service({ factory: [UserWriteModelFactory, 'create']})
-export class UserWriteModel implements IUserWrite, IUserRead {
+export class UserModel implements IUserWrite, IUserRead {
     private model: Model<IWriteModelUserDocument>;
 
     constructor( private connection: Connection, private eventBus: EventBus ) {

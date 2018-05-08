@@ -2,17 +2,17 @@ import { Service } from 'typedi';
 import * as _ from 'lodash';
 
 import { ICommandHandler } from '../../command-bus/ICommandHandler';
-import { UserWriteModel } from '../write-model/UserWriteModel';
+import { UserModel } from '../model/UserModel';
 import { LoginUserCommand } from '../command/LoginUser';
 import { ILoginUserCommand } from '../command/ILoginUserCommand';
-import { IWriteModelUserDocument } from '../write-model/types';
+import { IWriteModelUserDocument } from '../model/types';
 import { ILoginUser } from '../command/ILoginUser';
 
 @Service()
 export class LoginUserHandler implements ICommandHandler {
     public name: string = 'login-user';
 
-    constructor(private userModel: UserWriteModel) {
+    constructor(private userModel: UserModel) {
     }
 
     public async handle(command: ILoginUserCommand): Promise<void> {

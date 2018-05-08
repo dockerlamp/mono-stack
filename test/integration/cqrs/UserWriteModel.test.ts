@@ -3,10 +3,10 @@ import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
-import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
+import { UserModel } from '../../../src/model/user/model/UserModel';
 
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
-import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/write-model/types';
+import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/model/types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
@@ -22,15 +22,15 @@ let user: ILoginUser = {
 
 describe('CQRS - UserWriteModel', () => {
     let connection: Connection;
-    let writeModel: UserWriteModel;
+    let userModel: UserModel;
 
     let deleteAll = async () => {
-        await connection.collection('write-users').deleteMany({});
+        await connection.collection('users').deleteMany({});
     };
 
     beforeAll(async () => {
         let testDbContainer = getTestDbContainer();
-        writeModel = testDbContainer.get(UserWriteModel);
+        userModel = testDbContainer.get(UserModel);
         connection = testDbContainer.get(MongoConnection).getConnection();
         testDbContainer.reset();
     });
@@ -48,30 +48,30 @@ describe('CQRS - UserWriteModel', () => {
     };
 
     it('should save new user', async () => {
-        let dbUser = await writeModel.insertUser(user);
+        let dbUser = await userModel.insertUser(user);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should get existing user by provider', async () => {
-        await writeModel.insertUser(user);
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        await userModel.insertUser(user);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should get existing user by email', async () => {
-        await writeModel.insertUser(user);
-        let dbUser = await writeModel.getUseByEmail(user.email);
+        await userModel.insertUser(user);
+        let dbUser = await userModel.getUseByEmail(user.email);
         expectDbUserEqualsLoginUser(dbUser);
     });
 
     it('should update existing user', async () => {
-        let insertedUser = await writeModel.insertUser(user);
+        let insertedUser = await userModel.insertUser(user);
         let updatedUserData = {
             userName: 'foo bar',
         };
         insertedUser.set(updatedUserData);
         await insertedUser.save();
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
         expect(dbUser.id).toEqual(insertedUser.id);
         expect(dbUser.userName).toEqual(updatedUserData.userName);
     });

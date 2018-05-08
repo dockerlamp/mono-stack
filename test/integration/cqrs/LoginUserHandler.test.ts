@@ -3,7 +3,7 @@ import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
-import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
+import { UserModel } from '../../../src/model/user/model/UserModel';
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
 import { EventBus } from '../../../src/model/command-bus/EventBus';
 import { LoginUserHandler } from '../../../src/model/user/command-handler/LoginUserHandler';
@@ -51,17 +51,17 @@ let userFromOtherProvider: ILoginUser = {
 
 describe('CQRS - LoginUserHandler', () => {
     let connection: Connection;
-    let writeModel: UserWriteModel;
+    let userModel: UserModel;
     let loginUserHandler: LoginUserHandler;
     let testDbContainer;
 
     let deleteAll = async () => {
-        let result = await connection.collection('write-users').deleteMany({});
+        let result = await connection.collection('users').deleteMany({});
     };
 
     beforeAll(async () => {
         testDbContainer = getTestDbContainer();
-        writeModel = testDbContainer.get(UserWriteModel);
+        userModel = testDbContainer.get(UserModel);
         loginUserHandler = testDbContainer.get(LoginUserHandler);
         connection = testDbContainer.get(MongoConnection).getConnection();
     });
@@ -77,7 +77,7 @@ describe('CQRS - LoginUserHandler', () => {
             payload: user
         });
 
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
         expect(dbUser).not.toBeNull();
         expect(dbUser.email).toEqual(user.email);
         expect(dbUser.userName).toEqual(user.userName);
@@ -93,13 +93,13 @@ describe('CQRS - LoginUserHandler', () => {
             payload: user
         });
 
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
         await loginUserHandler.handle({
             id: 'id',
             name: 'name',
             payload: user
         });
-        let dbUser2 = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser2 = await userModel.getUserByProvider(user.provider, user.providerUserId);
         expect(dbUser2.id).toEqual(dbUser.id);
     });
 
@@ -110,13 +110,13 @@ describe('CQRS - LoginUserHandler', () => {
             payload: user
         });
 
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
         await loginUserHandler.handle({
             id: 'id',
             name: 'name',
             payload: userFromOtherProvider
         });
-        let dbUser2 = await writeModel.getUserByProvider(
+        let dbUser2 = await userModel.getUserByProvider(
             userFromOtherProvider.provider, userFromOtherProvider.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);
@@ -130,14 +130,14 @@ describe('CQRS - LoginUserHandler', () => {
             name: 'name',
             payload: user
         });
-        let dbUser = await writeModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
 
         await loginUserHandler.handle({
             id: 'id',
             name: 'name',
             payload: userWithChangedAllDatafields
         });
-        let dbUser2 = await writeModel.getUserByProvider(
+        let dbUser2 = await userModel.getUserByProvider(
             userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);
@@ -153,7 +153,7 @@ describe('CQRS - LoginUserHandler', () => {
             name: 'name',
             payload: userWithEmptyDataFields
         });
-        let dbUser = await writeModel.getUserByProvider(
+        let dbUser = await userModel.getUserByProvider(
             userWithEmptyDataFields.provider, userWithEmptyDataFields.providerUserId);
 
         await loginUserHandler.handle({
@@ -161,7 +161,7 @@ describe('CQRS - LoginUserHandler', () => {
             name: 'name',
             payload: userWithChangedAllDatafields
         });
-        let dbUser2 = await writeModel.getUserByProvider(
+        let dbUser2 = await userModel.getUserByProvider(
             userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);

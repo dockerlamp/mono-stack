@@ -1,6 +1,6 @@
 import { Service } from 'typedi';
 
-import { UserWriteModel } from './UserWriteModel';
+import { UserModel } from './UserModel';
 import { MongoConnection } from '../../db/MongoConnection';
 import { EventBus } from '../../command-bus/EventBus';
 
@@ -10,7 +10,7 @@ export class UserWriteModelFactory {
     }
 
     public create() {
-        return new UserWriteModel(this.mongoConnection.getConnection(), this.eventBus);
+        return new UserModel(this.mongoConnection.getConnection(), this.eventBus);
     }
 
 }
