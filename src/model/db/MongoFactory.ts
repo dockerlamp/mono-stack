@@ -1,11 +1,12 @@
 import * as mongoose from 'mongoose';
 import { Connection } from 'mongoose';
 
-import { IConfig, IMongoConfig } from '../../front/config';
+import { IMongoConfig } from '../../common/config/IMongoConfig';
 
 export class MongoFactory {
-    public static async getConnection(config: IMongoConfig): Promise<Connection> {
-        let connection = mongoose.createConnection(MongoFactory.getConnectionUri(config) , config.options);
+    public static getConnection(config: IMongoConfig): Connection {
+        let connectionUri = MongoFactory.getConnectionUri(config);
+        let connection = mongoose.createConnection(connectionUri, config.options);
         return connection;
     }
 

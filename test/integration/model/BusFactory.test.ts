@@ -1,18 +1,18 @@
+import Container from 'typedi';
 import {} from 'jest';
 
-import * as factory from '../../../src/model/command-bus/factory';
 import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
 import { UserReadModel } from '../../../src/model/user/read-model/UserReadModel';
 
 describe('Buses factory', () => {
 
     it('should return user write model', async () => {
-        let writeModel = await factory.writeModel;
+        let writeModel = Container.get(UserWriteModel);
         expect(writeModel).toBeInstanceOf(UserWriteModel);
     });
 
     it('should return user read model', async () => {
-        let readModel = await factory.readModel;
+        let readModel = Container.get(UserReadModel);
         expect(readModel).toBeInstanceOf(UserReadModel);
     });
 

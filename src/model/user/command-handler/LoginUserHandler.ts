@@ -1,3 +1,4 @@
+import { Service } from 'typedi';
 import * as _ from 'lodash';
 
 import { ICommandHandler } from '../../command-bus/ICommandHandler';
@@ -7,13 +8,14 @@ import { ILoginUserCommand } from '../command/ILoginUserCommand';
 import { IWriteModelUserDocument } from '../write-model/types';
 import { ILoginUser } from '../command/ILoginUser';
 
+@Service()
 export class LoginUserHandler implements ICommandHandler {
     public name: string = 'login-user';
 
     constructor(private userModel: UserWriteModel) {
     }
 
-    public async handle(command: ILoginUserCommand) {
+    public async handle(command: ILoginUserCommand): Promise<void> {
         let {provider, providerUserId, email} = command.payload;
         // get user by provider id
         let user = await this.userModel.getUserByProvider(provider, providerUserId);

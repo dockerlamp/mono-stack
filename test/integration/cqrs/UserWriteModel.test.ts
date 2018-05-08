@@ -4,16 +4,12 @@ import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserWriteModel } from '../../../src/model/user/write-model/UserWriteModel';
-import { config } from '../../../src/front/config';
+
 import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
-import { EventBus } from '../../../src/model/command-bus/EventBus';
 import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/write-model/types';
-
-function delay(milis: number): Promise<any> {
-    return new Promise((resolve) => setTimeout(resolve, milis));
-}
-
-const TEST_DB = 'monostack-test';
+import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
+import { MongoConnection } from '../../../src/model/db/MongoConnection';
+import { getTestDbContainer } from '../helpers/getTestDbContainer';
 
 let user: ILoginUser = {
     email: 'foo@bar.com',
@@ -26,7 +22,6 @@ let user: ILoginUser = {
 
 describe('CQRS - UserWriteModel', () => {
     let connection: Connection;
-    let eventBus: EventBus;
     let writeModel: UserWriteModel;
 
     let deleteAll = async () => {
@@ -34,14 +29,13 @@ describe('CQRS - UserWriteModel', () => {
     };
 
     beforeAll(async () => {
-        let mongoConfig = _.cloneDeep(config.model.mongodb);
-        mongoConfig.database = TEST_DB;
-        connection = await MongoFactory.getConnection(mongoConfig);
-        eventBus = new EventBus();
+        let testDbContainer = getTestDbContainer();
+        writeModel = testDbContainer.get(UserWriteModel);
+        connection = testDbContainer.get(MongoConnection).getConnection();
+        testDbContainer.reset();
     });
 
     beforeEach(async () => {
-        writeModel = new UserWriteModel(connection, eventBus);
         await deleteAll();
     });
 

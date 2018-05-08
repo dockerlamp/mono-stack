@@ -2,6 +2,7 @@ import {} from 'jest';
 import { Express } from 'express';
 import * as express from 'express';
 import * as request from 'supertest';
+import Container from 'typedi';
 
 import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
 import { IWriteModelUser } from '../../model/user/write-model/types';
@@ -11,8 +12,7 @@ describe('RootControoler', () => {
     let applicationFactory: ApplicationFactory;
 
     beforeEach(async () => {
-        applicationFactory = new ApplicationFactory();
-
+        applicationFactory = Container.get(ApplicationFactory);
     });
 
     it('get / should return status 200', async () => {

@@ -1,8 +1,9 @@
 import {} from 'jest';
 import { Connection } from 'mongoose';
+import { Container } from 'typedi';
 
-import { config } from '../../../src/front/config';
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
+import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 
 const TEST_COLLECTION = 'test';
 
@@ -10,7 +11,9 @@ describe('Mongo factory', () => {
     let connection: Connection;
 
     beforeEach(async () => {
-        connection = await MongoFactory.getConnection(config.model.mongodb);
+        const configProvider = Container.get(FrontConfigProvider);
+        const mongoConfig = configProvider.getConfig().model.mongodb;
+        connection = await MongoFactory.getConnection(mongoConfig);
     });
 
     it('should return mongoose connection', async () => {

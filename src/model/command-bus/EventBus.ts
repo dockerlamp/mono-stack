@@ -5,8 +5,8 @@ import { ICommandHandler } from './ICommandHandler';
 export class EventBus {
     private eventEmitter: EventEmitter;
 
-    constructor(eventEmitter: EventEmitter = null) {
-        this.eventEmitter = eventEmitter ? eventEmitter : new EventEmitter();
+    constructor() {
+        this.eventEmitter = new EventEmitter();
     }
 
     public async publish(command: ICommand) {

@@ -1,8 +1,10 @@
+import { Service } from 'typedi';
 import { Express } from 'express';
 import * as _ from 'lodash';
 
 import { IController } from './IController';
 
+@Service()
 export class RootController implements IController {
     public async initRoutings(app: Express): Promise<void> {
         app.get('/', async (req, res, next) => {

@@ -1,14 +1,15 @@
+import { Service } from 'typedi';
 import { Express } from 'express';
 import * as passport from 'passport';
 import * as _ from 'lodash';
 import { Strategy as GithubStrategy } from 'passport-github';
 
-import { config } from '../config';
 import { IController } from './IController';
-import { commandBus, readModel } from '../../model/command-bus/factory';
 import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
 import { ILoginUser } from '../../model/user/command/ILoginUser';
+import { FrontConfigProvider } from '../config/FrontConfigProvider';
+import { CommandBus } from '../../model/command-bus/CommandBus';
 
 const GITHUB_PROVIDER = 'github';
 
@@ -28,11 +29,16 @@ interface IGithubProfile {
     }];
 }
 
+@Service()
 export class AuthController implements IController {
     private passport;
     private passportStrategyProviders: string[];
 
-    constructor() {
+    constructor(
+        private frontConfigProvider: FrontConfigProvider,
+        private commandBus: CommandBus,
+        private getProviderUser: GetProviderUser,
+    ) {
         this.passportStrategyProviders = [ GITHUB_PROVIDER ];
         this.passport = this.getPassport();
     }
@@ -77,6 +83,7 @@ export class AuthController implements IController {
                 .then((user: ILoginUser) => cb( null, user ))
                 .catch((err) => cb( err ));
         };
+        let config = this.frontConfigProvider.getConfig();
         let strategyOptions = _.merge(config.authProvider.gitHub, {
             scope: [ 'user:email' ]
         });
@@ -112,11 +119,10 @@ export class AuthController implements IController {
             // session.passport.user -> req.user
             try {
                 // CQRS: query
-                let getProviderUser = new GetProviderUser(await readModel);
                 // @TODO: wait for user ...
                 // - repeat/query/sleep
                 // - eventbus.subscribe(...)
-                let modelUser = await getProviderUser.query(user.provider, user.providerUserId);
+                let modelUser = await this.getProviderUser.query(user.provider, user.providerUserId);
                 done(null, modelUser);
             } catch (err) {
                 done(err);
@@ -138,7 +144,7 @@ export class AuthController implements IController {
         let loginUserCommand = new LoginUserCommand();
         loginUserCommand.payload = user;
         // send async command and dont wait to complete
-        commandBus.sendCommand(loginUserCommand)
+        this.commandBus.sendCommand(loginUserCommand)
             .then(() => console.log('Command sent'))
             .catch((err) => console.error(err));
 
