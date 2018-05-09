@@ -1,7 +1,10 @@
 import { EventEmitter } from 'events';
+import { Service } from 'typedi';
+
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
 
+@Service()
 export class EventBus {
     private eventEmitter: EventEmitter;
 
