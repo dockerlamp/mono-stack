@@ -1,6 +1,6 @@
 import { ILoginUser } from '../service/ILoginUser';
-import { IWriteModelUserDocument } from './types';
+import { IUserDocument } from './types';
 
 export interface IUserWrite {
-    insertUser(userData: ILoginUser): Promise<IWriteModelUserDocument>;
+    insertUser(userData: ILoginUser): Promise<IUserDocument>;
 }

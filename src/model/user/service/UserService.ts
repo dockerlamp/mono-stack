@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { UserModel } from '../model/UserModel';
 import { ILoginUser } from './ILoginUser';
-import { IWriteModelUserDocument } from '../model/types';
+import { IUserDocument } from '../model/types';
 
 @Service()
 export class UserService {
@@ -18,15 +18,15 @@ export class UserService {
             user = await this.userModel.getUseByEmail(email);
         }
         if (user) {
-            // if exist then update only fields which does nod exists in user
-            await this.updateUser(user, loginUser);
+            // if exist then update only fields which does not exists in user
+            await this.updateUserUndefinedFields(user, loginUser);
         } else {
             // if doesnt exists add new user
             await this.userModel.insertUser(loginUser);
         }
     }
 
-    private async updateUser(user: IWriteModelUserDocument, loginPayload: ILoginUser) {
+    private async updateUserUndefinedFields(user: IUserDocument, loginPayload: ILoginUser) {
         let updateData = {};
         let compareFields = {
             firstName: loginPayload.firstName,

@@ -6,7 +6,7 @@ import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserModel } from '../../../src/model/user/model/UserModel';
 
 import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
-import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/model/types';
+import { IUserDocument, IUser } from '../../model/user/model/types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
@@ -39,7 +39,7 @@ describe('CQRS - UserWriteModel', () => {
         await deleteAll();
     });
 
-    let expectDbUserEqualsLoginUser = (dbUser: IWriteModelUserDocument) => {
+    let expectDbUserEqualsLoginUser = (dbUser: IUserDocument) => {
         expect(dbUser.email).toEqual(user.email);
         expect(dbUser.userName).toEqual(user.userName);
         expect(dbUser.firstName).toEqual(user.firstName);

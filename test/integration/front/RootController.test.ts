@@ -5,7 +5,7 @@ import * as request from 'supertest';
 import Container from 'typedi';
 
 import { ApplicationFactory } from '../../../src/front/ApplicationFactory';
-import { IWriteModelUser } from '../../model/user/model/types';
+import { IUser } from '../../model/user/model/types';
 
 describe('RootControoler', () => {
     let expressApplication: Express;
@@ -27,7 +27,7 @@ describe('RootControoler', () => {
 
     it('get / when user is logged in', async () => {
         expressApplication = express();
-        let user: IWriteModelUser = {
+        let user: IUser = {
             userName: 'foobar',
             displayName: 'foo bar',
             id: 'user id',
