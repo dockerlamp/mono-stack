@@ -1,7 +1,7 @@
 import * as uuid from 'uuid';
 
 import { ILoginUserCommand } from './ILoginUserCommand';
-import { ILoginUser } from './ILoginUser';
+import { ILoginUser } from '../service/ILoginUser';
 
 export class LoginUserCommand implements ILoginUserCommand {
     public name: string = 'login-user';

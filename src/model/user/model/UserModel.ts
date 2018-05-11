@@ -4,7 +4,7 @@ import * as uuid from 'uuid';
 import { EventEmitter } from 'events';
 import { Connection, Model } from 'mongoose';
 
-import { ILoginUser } from '../command/ILoginUser';
+import { ILoginUser } from '../service/ILoginUser';
 import { IWriteModelUser, WriteModelUserSchema, IWriteModelUserDocument } from './types';
 import { EventBus } from '../../command-bus/EventBus';
 import { IUserWrite } from './IUserWrite';

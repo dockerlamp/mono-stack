@@ -5,7 +5,7 @@ import * as _ from 'lodash';
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserModel } from '../../../src/model/user/model/UserModel';
 
-import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
+import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
 import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/model/types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';

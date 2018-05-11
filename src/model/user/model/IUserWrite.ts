@@ -1,4 +1,4 @@
-import { ILoginUser } from '../command/ILoginUser';
+import { ILoginUser } from '../service/ILoginUser';
 import { IWriteModelUserDocument } from './types';
 
 export interface IUserWrite {

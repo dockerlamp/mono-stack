@@ -7,7 +7,7 @@ import { Strategy as GithubStrategy } from 'passport-github';
 import { IController } from './IController';
 import { GetProviderUser } from '../../model/user/query/GetProviderUser';
 import { LoginUserCommand } from '../../model/user/command/LoginUser';
-import { ILoginUser } from '../../model/user/command/ILoginUser';
+import { ILoginUser } from '../../model/user/service/ILoginUser';
 import { FrontConfigProvider } from '../config/FrontConfigProvider';
 import { CommandBus } from '../../model/command-bus/CommandBus';
 

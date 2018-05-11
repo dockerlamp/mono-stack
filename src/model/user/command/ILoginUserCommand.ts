@@ -1,5 +1,5 @@
 import { ICommand } from '../../command-bus/ICommand';
-import { ILoginUser } from './ILoginUser';
+import { ILoginUser } from '../service/ILoginUser';
 
 export interface ILoginUserCommand extends ICommand {
     name: string;

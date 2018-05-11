@@ -4,7 +4,7 @@ import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserModel } from '../../../src/model/user/model/UserModel';
-import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
+import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
 import { EventBus } from '../../../src/model/command-bus/EventBus';
 import { LoginUserHandler } from '../../../src/model/user/command-handler/LoginUserHandler';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
