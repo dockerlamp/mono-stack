@@ -1,14 +1,14 @@
 import { Service } from 'typedi';
 
-import { UserModel } from '../model/UserModel';
+import { UserService } from '../service/UserService';
 
 @Service()
 export class GetProviderUser {
-    constructor(private userModel: UserModel) {
+    constructor(private userService: UserService) {
     }
 
     // @TODO missing return type
     public async query(provider: string, providerUserId: string): Promise<any> {
-        return await this.userModel.getUserByProvider(provider, providerUserId);
+        return await this.userService.getUserByProvider(provider, providerUserId);
     }
 }

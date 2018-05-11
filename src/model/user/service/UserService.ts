@@ -20,6 +20,10 @@ export class UserService {
         }
     }
 
+    public async getUserByProvider(provider: string, providerUserId: string): Promise<IUser> {
+        return await this.userModel.getUserByProvider(provider, providerUserId);
+    }
+
     private async findLoginUser(loginUser: ILoginUser): Promise<IUserDocument> {
         let {provider, providerUserId, email} = loginUser;
         // get user by provider id
