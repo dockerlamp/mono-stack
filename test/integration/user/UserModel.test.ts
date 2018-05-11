@@ -20,7 +20,7 @@ let user: ILoginUser = {
     providerUserId: 'foo-id'
 };
 
-describe('CQRS - UserWriteModel', () => {
+describe('UserModel', () => {
     let connection: Connection;
     let userModel: UserModel;
 
