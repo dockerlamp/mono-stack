@@ -5,7 +5,7 @@ import { MongoConnection } from '../../db/MongoConnection';
 import { EventBus } from '../../command-bus/EventBus';
 
 @Service()
-export class UserWriteModelFactory {
+export class UserModelFactory {
     constructor(private mongoConnection: MongoConnection, private eventBus: EventBus) {
     }
 

@@ -5,15 +5,15 @@ import { EventEmitter } from 'events';
 import { Connection, Model } from 'mongoose';
 
 import { ILoginUser } from '../service/ILoginUser';
-import { IUser, UserSchema, IUserDocument } from './types';
+import { IUser, UserSchema, IUserDocument } from './IUser-types';
 import { EventBus } from '../../command-bus/EventBus';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
-import { UserWriteModelFactory } from './UserModelFactory';
+import { UserModelFactory } from './UserModelFactory';
 
 const USER_COLLECTION = 'user';
 
-@Service({ factory: [UserWriteModelFactory, 'create']})
+@Service({ factory: [UserModelFactory, 'create']})
 export class UserModel implements IUserWrite, IUserRead {
     private model: Model<IUserDocument>;
 

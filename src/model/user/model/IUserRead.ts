@@ -1,4 +1,4 @@
-import { IUser } from './types';
+import { IUser } from './IUser-types';
 
 export interface IUserRead {
     getUserByProvider(provider: string, providerUserId: string): Promise<IUser>;

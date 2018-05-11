@@ -6,7 +6,7 @@ import { MongoFactory } from '../../../src/model/db/MongoFactory';
 import { UserModel } from '../../../src/model/user/model/UserModel';
 
 import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
-import { IUserDocument, IUser } from '../../model/user/model/types';
+import { IUserDocument, IUser } from '../../model/user/model/IUser-types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';

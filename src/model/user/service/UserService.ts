@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 
 import { UserModel } from '../model/UserModel';
 import { ILoginUser } from './ILoginUser';
-import { IUserDocument, IUser } from '../model/types';
+import { IUserDocument, IUser } from '../model/IUser-types';
 
 @Service()
 export class UserService {
