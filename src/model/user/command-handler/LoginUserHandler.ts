@@ -5,8 +5,11 @@ import { ICommandHandler } from '../../command-bus/ICommandHandler';
 import { ILoginUserCommand } from '../command/ILoginUserCommand';
 import { UserService } from '../service/UserService';
 
+/**
+ * @deprecated
+ */
 @Service()
-export class LoginUserHandler implements ICommandHandler {
+class LoginUserHandler implements ICommandHandler {
     public name: string = 'login-user';
 
     constructor(private userService: UserService) {

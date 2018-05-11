@@ -23,10 +23,7 @@ export class RootController implements IController {
                 `<a href="/logout">logout</a>`
             );
         } else {
-            // @TODO remove passport dependency
-            let loginMessage = _.get(req, 'session.passport.user', false) ?
-                `login in progress` :
-                'you are anonymous';
+            let loginMessage = 'you are anonymous';
             res.send(`Hi, ${loginMessage}, <a href="/login/github">sign in</a> with github account`);
         }
     }
