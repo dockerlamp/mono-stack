@@ -3,7 +3,7 @@ import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
-import { UserModel } from '../../../src/model/user/model/UserModel';
+import { UserModel, USER_COLLECTION } from '../../../src/model/user/model/UserModel';
 
 import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
 import { IUserDocument, IUser } from '../../model/user/model/IUser-types';
@@ -25,7 +25,7 @@ describe('UserModel', () => {
     let userModel: UserModel;
 
     let deleteAll = async () => {
-        await connection.collection('users').deleteMany({});
+        await connection.collection(USER_COLLECTION).deleteMany({});
     };
 
     beforeAll(async () => {

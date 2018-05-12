@@ -2,7 +2,7 @@ import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
-import { UserModel } from '../../../src/model/user/model/UserModel';
+import { UserModel, USER_COLLECTION } from '../../../src/model/user/model/UserModel';
 import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
@@ -52,7 +52,7 @@ describe('UserService', () => {
     let testDbContainer;
 
     let deleteAll = async () => {
-        let result = await connection.collection('users').deleteMany({});
+        await connection.collection(USER_COLLECTION).deleteMany({});
     };
 
     beforeAll(async () => {

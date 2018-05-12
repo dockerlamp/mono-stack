@@ -1,31 +1,22 @@
 import { Service } from 'typedi';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
-import { EventEmitter } from 'events';
 import { Connection, Model } from 'mongoose';
 
 import { ILoginUser } from '../service/ILoginUser';
 import { IUser, UserSchema, IUserDocument } from './IUser-types';
-import { EventBus } from '../../command-bus/EventBus';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
 import { UserModelFactory } from './UserModelFactory';
 
-const USER_COLLECTION = 'user';
+export const USER_COLLECTION = 'user';
 
 @Service({ factory: [UserModelFactory, 'create']})
 export class UserModel implements IUserWrite, IUserRead {
     private model: Model<IUserDocument>;
 
-    constructor( private connection: Connection, private eventBus: EventBus ) {
-        this.model = connection.model(USER_COLLECTION, UserSchema);
-        this.model.schema.post('save', function() {
-            eventBus.publish({
-                id: uuid.v4(),
-                name: 'write-user-updated',
-                payload: this,
-            });
-        });
+    constructor( private connection: Connection ) {
+        this.model = connection.model(USER_COLLECTION, UserSchema, USER_COLLECTION);
     }
 
     public async insertUser(userData: ILoginUser): Promise<IUserDocument> {
