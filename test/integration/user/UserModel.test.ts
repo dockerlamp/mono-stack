@@ -3,10 +3,10 @@ import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
 import { MongoFactory } from '../../../src/model/db/MongoFactory';
-import { UserModel } from '../../../src/model/user/model/UserModel';
+import { UserModel, USER_COLLECTION } from '../../../src/model/user/model/UserModel';
 
-import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
-import { IWriteModelUserDocument, IWriteModelUser } from '../../model/user/model/types';
+import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
+import { IUserDocument, IUser } from '../../model/user/model/IUser-types';
 import { FrontConfigProvider } from '../../../src/front/config/FrontConfigProvider';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
@@ -20,12 +20,12 @@ let user: ILoginUser = {
     providerUserId: 'foo-id'
 };
 
-describe('CQRS - UserWriteModel', () => {
+describe('UserModel', () => {
     let connection: Connection;
     let userModel: UserModel;
 
     let deleteAll = async () => {
-        await connection.collection('users').deleteMany({});
+        await connection.collection(USER_COLLECTION).deleteMany({});
     };
 
     beforeAll(async () => {
@@ -39,7 +39,7 @@ describe('CQRS - UserWriteModel', () => {
         await deleteAll();
     });
 
-    let expectDbUserEqualsLoginUser = (dbUser: IWriteModelUserDocument) => {
+    let expectDbUserEqualsLoginUser = (dbUser: IUserDocument) => {
         expect(dbUser.email).toEqual(user.email);
         expect(dbUser.userName).toEqual(user.userName);
         expect(dbUser.firstName).toEqual(user.firstName);

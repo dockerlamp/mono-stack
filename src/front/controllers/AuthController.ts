@@ -5,11 +5,9 @@ import * as _ from 'lodash';
 import { Strategy as GithubStrategy } from 'passport-github';
 
 import { IController } from './IController';
-import { GetProviderUser } from '../../model/user/query/GetProviderUser';
-import { LoginUserCommand } from '../../model/user/command/LoginUser';
-import { ILoginUser } from '../../model/user/command/ILoginUser';
+import { ILoginUser } from '../../model/user/service/ILoginUser';
 import { FrontConfigProvider } from '../config/FrontConfigProvider';
-import { CommandBus } from '../../model/command-bus/CommandBus';
+import { UserService } from '../../model/user/service/UserService';
 
 const GITHUB_PROVIDER = 'github';
 
@@ -36,8 +34,7 @@ export class AuthController implements IController {
 
     constructor(
         private frontConfigProvider: FrontConfigProvider,
-        private commandBus: CommandBus,
-        private getProviderUser: GetProviderUser,
+        private userService: UserService,
     ) {
         this.passportStrategyProviders = [ GITHUB_PROVIDER ];
         this.passport = this.getPassport();
@@ -118,11 +115,7 @@ export class AuthController implements IController {
             // deserialize serialized user to store in req.user field
             // session.passport.user -> req.user
             try {
-                // CQRS: query
-                // @TODO: wait for user ...
-                // - repeat/query/sleep
-                // - eventbus.subscribe(...)
-                let modelUser = await this.getProviderUser.query(user.provider, user.providerUserId);
+                let modelUser = await this.userService.getUserByProvider(user.provider, user.providerUserId);
                 done(null, modelUser);
             } catch (err) {
                 done(err);
@@ -133,7 +126,7 @@ export class AuthController implements IController {
     }
 
     private async saveGithubUserProfile(profile: IGithubProfile): Promise<ILoginUser> {
-        let user: ILoginUser = {
+        let loginUser: ILoginUser = {
             provider: GITHUB_PROVIDER,
             providerUserId: profile.id,
             // @TODO send all emails
@@ -141,13 +134,8 @@ export class AuthController implements IController {
             userName: profile.username,
             displayName: profile.displayName,
         };
-        let loginUserCommand = new LoginUserCommand();
-        loginUserCommand.payload = user;
-        // send async command and dont wait to complete
-        this.commandBus.sendCommand(loginUserCommand)
-            .then(() => console.log('Command sent'))
-            .catch((err) => console.error(err));
+        await this.userService.login(loginUser);
 
-        return user;
+        return loginUser;
     }
 }

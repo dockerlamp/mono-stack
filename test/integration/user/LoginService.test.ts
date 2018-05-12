@@ -2,14 +2,11 @@ import { } from 'jest';
 import { Connection } from 'mongoose';
 import * as _ from 'lodash';
 
-import { MongoFactory } from '../../../src/model/db/MongoFactory';
-import { UserModel } from '../../../src/model/user/model/UserModel';
-import { ILoginUser } from '../../../src/model/user/command/ILoginUser';
-import { EventBus } from '../../../src/model/command-bus/EventBus';
-import { LoginUserHandler } from '../../../src/model/user/command-handler/LoginUserHandler';
+import { UserModel, USER_COLLECTION } from '../../../src/model/user/model/UserModel';
+import { ILoginUser } from '../../../src/model/user/service/ILoginUser';
 import { getTestDbContainer } from '../helpers/getTestDbContainer';
-import { delay } from '../helpers/delay';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
+import { UserService } from '../../../src/model/user/service/UserService';
 
 const TEST_DB = 'monostack-test';
 
@@ -49,20 +46,18 @@ let userFromOtherProvider: ILoginUser = {
     providerUserId: 'bar-id'
 };
 
-describe('CQRS - LoginUserHandler', () => {
+describe('UserService', () => {
     let connection: Connection;
-    let userModel: UserModel;
-    let loginUserHandler: LoginUserHandler;
+    let userService: UserService;
     let testDbContainer;
 
     let deleteAll = async () => {
-        let result = await connection.collection('users').deleteMany({});
+        await connection.collection(USER_COLLECTION).deleteMany({});
     };
 
     beforeAll(async () => {
         testDbContainer = getTestDbContainer();
-        userModel = testDbContainer.get(UserModel);
-        loginUserHandler = testDbContainer.get(LoginUserHandler);
+        userService = testDbContainer.get(UserService);
         connection = testDbContainer.get(MongoConnection).getConnection();
     });
 
@@ -71,13 +66,20 @@ describe('CQRS - LoginUserHandler', () => {
     });
 
     it('first login should create new user in db', async () => {
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: user
-        });
+        let dbUser = await userService.login(user);
 
-        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
+        expect(dbUser).not.toBeNull();
+        expect(dbUser.email).toEqual(user.email);
+        expect(dbUser.userName).toEqual(user.userName);
+        expect(dbUser.firstName).toEqual(user.firstName);
+        expect(dbUser.lastName).toEqual(user.lastName);
+        expect(dbUser.providerIds[user.provider]).toEqual(user.providerUserId);
+    });
+
+    it('user can by found by provider id', async () => {
+        await userService.login(user);
+        let dbUser = await userService.getUserByProvider(user.provider, user.providerUserId);
+
         expect(dbUser).not.toBeNull();
         expect(dbUser.email).toEqual(user.email);
         expect(dbUser.userName).toEqual(user.userName);
@@ -87,37 +89,15 @@ describe('CQRS - LoginUserHandler', () => {
     });
 
     it('second login should return the same user', async () => {
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: user
-        });
-
-        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: user
-        });
-        let dbUser2 = await userModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userService.login(user);
+        let dbUser2 = await userService.login(user);
         expect(dbUser2.id).toEqual(dbUser.id);
     });
 
     it('second login with different provider but the same email should add provider to existing one', async () => {
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: user
-        });
+        let dbUser = await userService.login(user);
+        let dbUser2 = await userService.login(userFromOtherProvider);
 
-        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: userFromOtherProvider
-        });
-        let dbUser2 = await userModel.getUserByProvider(
-            userFromOtherProvider.provider, userFromOtherProvider.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);
         expect(dbUser2.providerIds[user.provider]).toEqual(user.providerUserId);
@@ -125,20 +105,9 @@ describe('CQRS - LoginUserHandler', () => {
     });
 
     it('second login should not change defined fields from existing user', async () => {
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: user
-        });
-        let dbUser = await userModel.getUserByProvider(user.provider, user.providerUserId);
+        let dbUser = await userService.login(user);
+        let dbUser2 = await userService.login(userWithChangedAllDatafields);
 
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: userWithChangedAllDatafields
-        });
-        let dbUser2 = await userModel.getUserByProvider(
-            userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);
         expect(dbUser2.firstName).toEqual(user.firstName);
@@ -148,21 +117,9 @@ describe('CQRS - LoginUserHandler', () => {
     });
 
     it('second login should change undefined fields from existing user', async () => {
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: userWithEmptyDataFields
-        });
-        let dbUser = await userModel.getUserByProvider(
-            userWithEmptyDataFields.provider, userWithEmptyDataFields.providerUserId);
+        let dbUser = await userService.login(userWithEmptyDataFields);
+        let dbUser2 = await userService.login(userWithChangedAllDatafields);
 
-        await loginUserHandler.handle({
-            id: 'id',
-            name: 'name',
-            payload: userWithChangedAllDatafields
-        });
-        let dbUser2 = await userModel.getUserByProvider(
-            userWithChangedAllDatafields.provider, userWithChangedAllDatafields.providerUserId);
         expect(dbUser2).not.toBeNull();
         expect(dbUser2.id).toEqual(dbUser.id);
         expect(dbUser2.firstName).toEqual(userWithChangedAllDatafields.firstName);

@@ -1,38 +1,42 @@
 import { Service } from 'typedi';
 import * as _ from 'lodash';
 
-import { ICommandHandler } from '../../command-bus/ICommandHandler';
 import { UserModel } from '../model/UserModel';
-import { LoginUserCommand } from '../command/LoginUser';
-import { ILoginUserCommand } from '../command/ILoginUserCommand';
-import { IWriteModelUserDocument } from '../model/types';
-import { ILoginUser } from '../command/ILoginUser';
+import { ILoginUser } from './ILoginUser';
+import { IUserDocument, IUser } from '../model/IUser-types';
 
 @Service()
-export class LoginUserHandler implements ICommandHandler {
-    public name: string = 'login-user';
+export class UserService {
+    constructor(private userModel: UserModel) { }
 
-    constructor(private userModel: UserModel) {
+    public async login(loginUser: ILoginUser): Promise<IUser> {
+        let user = await this.findLoginUser(loginUser);
+        if (user) {
+            // if exist then update only fields which does not exists in user
+            return await this.updateUserUndefinedFields(user, loginUser);
+        } else {
+            // if doesnt exists add new user
+            return await this.userModel.insertUser(loginUser);
+        }
     }
 
-    public async handle(command: ILoginUserCommand): Promise<void> {
-        let {provider, providerUserId, email} = command.payload;
+    public async getUserByProvider(provider: string, providerUserId: string): Promise<IUser> {
+        return await this.userModel.getUserByProvider(provider, providerUserId);
+    }
+
+    private async findLoginUser(loginUser: ILoginUser): Promise<IUserDocument> {
+        let {provider, providerUserId, email} = loginUser;
         // get user by provider id
         let user = await this.userModel.getUserByProvider(provider, providerUserId);
         if (!user && email) {
             // get user by email
             user = await this.userModel.getUseByEmail(email);
         }
-        if (user) {
-            // if exist then update only fields which does nod exists in user
-            await this.updateUser(user, command.payload);
-        } else {
-            // if doesnt exists add new user
-            await this.userModel.insertUser(command.payload);
-        }
+
+        return user;
     }
 
-    private async updateUser(user: IWriteModelUserDocument, loginPayload: ILoginUser) {
+    private async updateUserUndefinedFields(user: IUserDocument, loginPayload: ILoginUser): Promise<IUserDocument> {
         let updateData = {};
         let compareFields = {
             firstName: loginPayload.firstName,
@@ -51,5 +55,7 @@ export class LoginUserHandler implements ICommandHandler {
         if (user.isModified) {
             await user.save();
         }
+
+        return user;
     }
 }

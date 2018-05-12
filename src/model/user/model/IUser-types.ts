@@ -1,6 +1,6 @@
 import { Schema, Document } from 'mongoose';
 
-export interface IWriteModelUser {
+export interface IUser {
     id: string;
     email?: string;
     firstName?: string;
@@ -14,10 +14,10 @@ export interface IWriteModelUser {
     };
 }
 
-export type IWriteModelUserDocument = IWriteModelUser & Document;
+export type IUserDocument = IUser & Document;
 
 // tslint:disable-next-line variable-name
-export const WriteModelUserSchema = new Schema({
+export const UserSchema = new Schema({
     email: String,
     firstName: String,
     lastName: String,
