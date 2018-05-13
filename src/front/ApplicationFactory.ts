@@ -8,6 +8,9 @@ import { RootController } from './controllers/RootController';
 import { AuthController } from './controllers/AuthController';
 import { ErrorController } from './controllers/ErrorController';
 import { SessionFactory } from './middlewares/SessionFactory';
+import { Logger } from '../common/logger/Logger';
+
+const logger = new Logger().getLogger();
 
 @Service()
 export class ApplicationFactory {
@@ -22,7 +25,7 @@ export class ApplicationFactory {
         if (!app) {
             app = express();
         }
-        app.use(morgan('tiny'));
+        app.use(morgan('tiny', { stream: logger.stream }));
         app.use(this.sessionFactory.create());
         app.use((req, res, next) => {
             if (!req.session) {
