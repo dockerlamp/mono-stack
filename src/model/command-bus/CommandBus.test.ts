@@ -1,17 +1,23 @@
+// reflect-metadata is required for typedi module
+import 'reflect-metadata';
+import { Container } from 'typedi';
+
 import {} from 'jest';
 import * as uuid from 'uuid';
 
 import { CommandBus } from './CommandBus';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
+import { Logger } from '../../common/logger/Logger';
 
 const COMMAND_NAME = 'test';
 
 describe('Command bus', () => {
     let bus: CommandBus;
+    let logging = Container.get(Logger);
 
     beforeEach(() => {
-        bus = new CommandBus();
+        bus = new CommandBus(logging);
     });
 
     it('should allow to receive sent command', async (done) => {
