@@ -4,6 +4,9 @@ import { Container } from 'typedi';
 
 import { ApplicationFactory } from './ApplicationFactory';
 import { FrontConfigProvider } from './config/FrontConfigProvider';
+import { Logger } from '../common/logger/Logger';
+
+const logger = new Logger().getLogger();
 
 (async () => {
     const applicationFactory = Container.get(ApplicationFactory);
@@ -12,6 +15,6 @@ import { FrontConfigProvider } from './config/FrontConfigProvider';
     const configProvider = Container.get(FrontConfigProvider);
     const port = configProvider.getConfig().port;
     app.listen(port, () => {
-        console.log(`Front app listening on port ${port}!`);
+        logger.info(`Front app listening on port ${port}!`);
     });
 })();

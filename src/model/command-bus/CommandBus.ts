@@ -4,6 +4,9 @@ import { EventEmitter } from 'events';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
 import { CommandBusFactory } from './CommandBusFactory';
+import { Logger } from '../../common/logger/Logger';
+
+const logger = new Logger().getLogger();
 
 @Service({ factory: [CommandBusFactory, 'create'] })
 export class CommandBus {
@@ -14,18 +17,18 @@ export class CommandBus {
     }
 
     public async sendCommand(command: ICommand) {
-        console.log(`Sending command ${command.name}/${command.id}`);
+        logger.info(`Sending command ${command.name}/${command.id}`);
         this.eventEmitter.emit(command.name, command);
     }
 
     public registerCommandHandler(handler: ICommandHandler) {
-        console.log(`Regiserd command ${handler.name}`);
+        logger.info(`Regiserd command ${handler.name}`);
         if (this.eventEmitter.listenerCount(handler.name) > 0 ) {
             throw new Error(
                 `CommandBus based on event emitter allows only one handler "${handler.name}"`);
         }
         this.eventEmitter.on(handler.name, async (command: ICommand) => {
-            console.log(`Handling command ${command.name}/${command.id}`);
+            logger.info(`Handling command ${command.name}/${command.id}`);
             await handler.handle(command);
         });
     }

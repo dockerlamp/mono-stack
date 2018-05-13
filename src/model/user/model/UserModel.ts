@@ -8,8 +8,10 @@ import { IUser, UserSchema, IUserDocument } from './IUser-types';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
 import { UserModelFactory } from './UserModelFactory';
+import { Logger } from '../../../common/logger/Logger';
 
 export const USER_COLLECTION = 'user';
+const logger = new Logger().getLogger();
 
 @Service({ factory: [UserModelFactory, 'create']})
 export class UserModel implements IUserWrite, IUserRead {
@@ -20,7 +22,7 @@ export class UserModel implements IUserWrite, IUserRead {
     }
 
     public async insertUser(userData: ILoginUser): Promise<IUserDocument> {
-        console.log('Saving user', userData);
+        logger.info('Saving user', userData);
         let writeModelUser = _.omit(userData, [ 'provider', 'providerUserId' ]) as IUser;
         _.set(writeModelUser, ['providerIds', userData.provider], userData.providerUserId);
         let user = await this.model.create(writeModelUser);
