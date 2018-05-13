@@ -8,9 +8,9 @@ import { RootController } from './controllers/RootController';
 import { AuthController } from './controllers/AuthController';
 import { ErrorController } from './controllers/ErrorController';
 import { SessionFactory } from './middlewares/SessionFactory';
-import { Logger } from '../common/logger/Logger';
+import { logging } from '../common/logger/Logger';
 
-const logger = new Logger().getLogger();
+const logger = logging.getLogger();
 
 @Service()
 export class ApplicationFactory {

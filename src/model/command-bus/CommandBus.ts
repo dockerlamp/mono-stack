@@ -4,9 +4,9 @@ import { EventEmitter } from 'events';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
 import { CommandBusFactory } from './CommandBusFactory';
-import { Logger } from '../../common/logger/Logger';
+import { logging } from '../../common/logger/Logger';
 
-const logger = new Logger().getLogger();
+const logger = logging.getLogger();
 
 @Service({ factory: [CommandBusFactory, 'create'] })
 export class CommandBus {

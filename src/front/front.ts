@@ -4,9 +4,9 @@ import { Container } from 'typedi';
 
 import { ApplicationFactory } from './ApplicationFactory';
 import { FrontConfigProvider } from './config/FrontConfigProvider';
-import { Logger } from '../common/logger/Logger';
+import { logging } from '../common/logger/Logger';
 
-const logger = new Logger().getLogger();
+const logger = logging.getLogger();
 
 (async () => {
     const applicationFactory = Container.get(ApplicationFactory);

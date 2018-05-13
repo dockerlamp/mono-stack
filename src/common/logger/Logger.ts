@@ -3,7 +3,7 @@ import * as winston from 'winston';
 import { config } from './config/default';
 
 @Service()
-export class Logger {
+class Logger {
     public getLogger(): winston.Logger {
         let transport;
         let option = config.useOption;
@@ -30,3 +30,5 @@ export class Logger {
         return logger;
     }
 }
+
+export let logging = new Logger();

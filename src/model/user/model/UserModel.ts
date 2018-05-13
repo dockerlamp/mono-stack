@@ -8,10 +8,10 @@ import { IUser, UserSchema, IUserDocument } from './IUser-types';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
 import { UserModelFactory } from './UserModelFactory';
-import { Logger } from '../../../common/logger/Logger';
+import { logging } from '../../../common/logger/Logger';
 
 export const USER_COLLECTION = 'user';
-const logger = new Logger().getLogger();
+const logger = logging.getLogger();
 
 @Service({ factory: [UserModelFactory, 'create']})
 export class UserModel implements IUserWrite, IUserRead {
