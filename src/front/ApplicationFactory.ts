@@ -25,7 +25,9 @@ export class ApplicationFactory {
         if (!app) {
             app = express();
         }
-        app.use(morgan('tiny', { stream: this.logger.stream }));
+        app.use(morgan('tiny', { stream: {
+            write: (message, encoding) => { this.logger.info(message); },
+        }}));
         app.use(this.sessionFactory.create());
         app.use((req, res, next) => {
             if (!req.session) {
@@ -58,5 +60,5 @@ export class ApplicationFactory {
         for (let controller of controllers) {
             await controller.initRoutings(app);
         }
-    }
+    };
 }
