@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import { Connection, Model } from 'mongoose';
+import * as winston from 'winston';
 
 import { ILoginUser } from '../service/ILoginUser';
 import { IUser, UserSchema, IUserDocument } from './IUser-types';
@@ -15,14 +16,12 @@ export const USER_COLLECTION = 'user';
 @Service({ factory: [UserModelFactory, 'create']})
 export class UserModel implements IUserWrite, IUserRead {
     private model: Model<IUserDocument>;
-    private logger;
 
     constructor(
         private connection: Connection,
-        private logging: Logger,
+        @Logger() private logger: winston.Logger
      ) {
         this.model = connection.model(USER_COLLECTION, UserSchema, USER_COLLECTION);
-        this.logger = this.logging.getLogger();
     }
 
     public async insertUser(userData: ILoginUser): Promise<IUserDocument> {

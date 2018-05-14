@@ -8,16 +8,16 @@ import * as uuid from 'uuid';
 import { CommandBus } from './CommandBus';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
-import { Logger } from '../../common/logger/Logger';
+import { LoggerFactory } from '../../common/logger/LoggerFactory';
 
 const COMMAND_NAME = 'test';
 
 describe('Command bus', () => {
     let bus: CommandBus;
-    let logging = Container.get(Logger);
+    let logger = Container.get(LoggerFactory).create();
 
     beforeEach(() => {
-        bus = new CommandBus(logging);
+        bus = new CommandBus(logger);
     });
 
     it('should allow to receive sent command', async (done) => {

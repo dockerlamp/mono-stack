@@ -2,6 +2,7 @@ import { Service } from 'typedi';
 import { Express } from 'express';
 import * as express from 'express';
 import * as morgan from 'morgan';
+import * as winston from 'winston';
 
 import { IController } from './controllers/IController';
 import { RootController } from './controllers/RootController';
@@ -17,14 +18,14 @@ export class ApplicationFactory {
         private rootController: RootController,
         private authController: AuthController,
         private errorController: ErrorController,
-        private logger: Logger,
+        @Logger() private logger: winston.Logger,
     ) {}
 
     public async createApplication(app?: Express): Promise<Express> {
         if (!app) {
             app = express();
         }
-        app.use(morgan('tiny', { stream: this.logger.getLogger().stream }));
+        app.use(morgan('tiny', { stream: this.logger.stream }));
         app.use(this.sessionFactory.create());
         app.use((req, res, next) => {
             if (!req.session) {

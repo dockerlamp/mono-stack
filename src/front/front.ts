@@ -1,10 +1,11 @@
 // reflect-metadata is required for typedi module
 import 'reflect-metadata';
 import { Container } from 'typedi';
+import * as winston from 'winston';
 
 import { ApplicationFactory } from './ApplicationFactory';
 import { FrontConfigProvider } from './config/FrontConfigProvider';
-import { Logger } from '../common/logger/Logger';
+import { LoggerFactory } from '../common/logger/LoggerFactory';
 
 (async () => {
     const applicationFactory = Container.get(ApplicationFactory);
@@ -12,8 +13,7 @@ import { Logger } from '../common/logger/Logger';
 
     const configProvider = Container.get(FrontConfigProvider);
     const port = configProvider.getConfig().port;
-    const logging = Container.get(Logger);
-    const logger = logging.getLogger();
+    const logger = Container.get(LoggerFactory).create();
 
     app.listen(port, () => {
         logger.info(`Front app listening on port ${port}!`);

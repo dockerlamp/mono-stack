@@ -1,5 +1,6 @@
 import { Service } from 'typedi';
 import { EventEmitter } from 'events';
+import * as winston from 'winston';
 
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
@@ -8,14 +9,10 @@ import { Logger } from '../../common/logger/Logger';
 
 @Service({ factory: [CommandBusFactory, 'create'] })
 export class CommandBus {
-    private logger;
     private eventEmitter: EventEmitter;
 
-    constructor(
-        private logging: Logger,
-    ) {
+    constructor(@Logger() private logger: winston.Logger) {
         this.eventEmitter = new EventEmitter();
-        this.logger = this.logging.getLogger();
     }
 
     public async sendCommand(command: ICommand) {
