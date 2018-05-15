@@ -25,8 +25,8 @@ export class ApplicationFactory {
         if (!app) {
             app = express();
         }
-        app.use(morgan('tiny', { stream: {
-            write: (message, encoding) => { this.logger.info(message); },
+        app.use(morgan('tiny',  { stream: {
+            write: (message) => { this.logger.info(message); },
         }}));
         app.use(this.sessionFactory.create());
         app.use((req, res, next) => {
