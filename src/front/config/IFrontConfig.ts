@@ -22,9 +22,14 @@ export interface IFrontConfig {
     };
     logger: {
         transports: {
-            file?: FileTransportInstance;
-            console?: ConsoleTransportInstance;
+            file?: {
+                config: FileTransportInstance;
+                enabled: boolean;
+            };
+            console?: {
+                config: ConsoleTransportInstance;
+                enabled: boolean;
+            };
         };
-        useOption: string;
     };
 }

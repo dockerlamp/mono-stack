@@ -29,12 +29,17 @@ let defaultConfig: IFrontConfig = {
     logger: {
         transports: {
             file: {
-                filename: `logs/monostack.log`,
+                config: {
+                    filename: `logs/monostack.log`,
+                },
+                enabled: false,
             },
             console: {
-            }
+                config: {
+                },
+                enabled: true,
+            },
         },
-        useOption: 'console'
     },
 };
 

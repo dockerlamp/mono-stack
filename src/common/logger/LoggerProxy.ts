@@ -14,24 +14,29 @@ export class LoggerProxy {
             return this.loggerInstance;
         }
 
-        let transport;
-        let config = this.frontConfigProvider.getConfig().logger;
+        let loggerConfig = this.frontConfigProvider.getConfig().logger;
+        let enabledTransports = [];
 
-        switch (config.useOption) {
-            case 'console':
-                transport = new winston.transports.Console(config.transports[config.useOption]);
-                break;
-            case 'file':
-                transport = new winston.transports.File(config.transports[config.useOption]);
-                break;
-            default:
-                throw new Error(`Unknown transport medium for logging ${config.useOption}`);
+        for (let name in loggerConfig.transports) {
+            if (!loggerConfig.transports[name].enabled) { continue; }
+            let transport;
+            switch (name) {
+                case 'console':
+                    transport = new winston.transports.Console(loggerConfig.transports[name].config);
+                    break;
+                case 'file':
+                    transport = new winston.transports.File(loggerConfig.transports[name].config);
+                    break;
+                default:
+                    throw new Error(`Unknown transport medium for logging: ${name}`);
+            }
+            enabledTransports.push(transport);
         }
-        let logger = new winston.Logger({
-            transports : [transport],
+
+        this.loggerInstance = new winston.Logger({
+            transports : enabledTransports,
         });
 
-        this.loggerInstance = logger;
         return this.loggerInstance;
     }
 }
