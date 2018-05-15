@@ -19,10 +19,10 @@ export class LoggerProxy {
 
         switch (config.useOption) {
             case 'console':
-                transport = new winston.transports.Console(config.options[config.useOption]);
+                transport = new winston.transports.Console(config.transports[config.useOption]);
                 break;
             case 'file':
-                transport = new winston.transports.File(config.options[config.useOption]);
+                transport = new winston.transports.File(config.transports[config.useOption]);
                 break;
             default:
                 throw new Error(`Unknown transport medium for logging ${config.useOption}`);

@@ -1,3 +1,5 @@
+import { FileTransportInstance, ConsoleTransportInstance } from 'winston';
+
 import { IMongoConfig } from '../../common/config/IMongoConfig';
 
 export interface IFrontConfig {
@@ -19,22 +21,9 @@ export interface IFrontConfig {
         };
     };
     logger: {
-        options: {
-            file: {
-                level: string,
-                filename: string,
-                handleExceptions: boolean,
-                json: boolean,
-                maxsize: number,
-                maxFiles: number,
-                colorize: boolean,
-            };
-            console: {
-                level: string,
-                handleExceptions: boolean,
-                json: boolean,
-                colorize: boolean,
-            }
+        transports: {
+            file?: FileTransportInstance;
+            console?: ConsoleTransportInstance;
         };
         useOption: string;
     };
