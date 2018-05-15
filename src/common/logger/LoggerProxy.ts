@@ -1,13 +1,13 @@
 import { Service } from 'typedi';
 import * as winston from 'winston';
 
-import { LoggerConfigProvider } from './LoggerConfigProvider';
+import { FrontConfigProvider } from '../../front/config/FrontConfigProvider';
 
 @Service()
 export class LoggerProxy {
     private loggerInstance: winston.Logger;
 
-    constructor(private loggerConfigProvider: LoggerConfigProvider) {}
+    constructor(private frontConfigProvider: FrontConfigProvider) {}
 
     public getLogger(): winston.Logger {
         if (this.loggerInstance) {
@@ -15,7 +15,7 @@ export class LoggerProxy {
         }
 
         let transport;
-        let config = this.loggerConfigProvider.getConfig();
+        let config = this.frontConfigProvider.getConfig().logger;
 
         switch (config.useOption) {
             case 'console':
