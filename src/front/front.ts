@@ -5,7 +5,7 @@ import * as winston from 'winston';
 
 import { ApplicationFactory } from './ApplicationFactory';
 import { FrontConfigProvider } from './config/FrontConfigProvider';
-import { LoggerFactory } from '../common/logger/LoggerFactory';
+import { LoggerProxy } from '../common/logger/LoggerProxy';
 
 (async () => {
     const applicationFactory = Container.get(ApplicationFactory);
@@ -13,7 +13,7 @@ import { LoggerFactory } from '../common/logger/LoggerFactory';
 
     const configProvider = Container.get(FrontConfigProvider);
     const port = configProvider.getConfig().port;
-    const logger = Container.get(LoggerFactory).create();
+    const logger = Container.get(LoggerProxy).getLogger();
 
     app.listen(port, () => {
         logger.info(`Front app listening on port ${port}!`);

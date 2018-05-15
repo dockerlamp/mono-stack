@@ -8,13 +8,13 @@ import * as uuid from 'uuid';
 import { CommandBus } from './CommandBus';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
-import { LoggerFactory } from '../../common/logger/LoggerFactory';
+import { LoggerProxy } from '../../common/logger/LoggerProxy';
 
 const COMMAND_NAME = 'test';
 
 describe('Command bus', () => {
     let bus: CommandBus;
-    let logger = Container.get(LoggerFactory).create();
+    let logger = Container.get(LoggerProxy).getLogger();
 
     beforeEach(() => {
         bus = new CommandBus(logger);
