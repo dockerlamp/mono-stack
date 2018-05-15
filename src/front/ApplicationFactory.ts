@@ -60,5 +60,5 @@ export class ApplicationFactory {
         for (let controller of controllers) {
             await controller.initRoutings(app);
         }
-    };
+    }
 }
