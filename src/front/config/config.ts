@@ -35,8 +35,6 @@ let defaultConfig: IFrontConfig = {
                 enabled: false,
             },
             console: {
-                config: {
-                },
                 enabled: true,
             },
         },

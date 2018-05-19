@@ -27,7 +27,7 @@ export interface IFrontConfig {
                 enabled: boolean;
             };
             console?: {
-                config: ConsoleTransportInstance;
+                config?: ConsoleTransportInstance;
                 enabled: boolean;
             };
         };
