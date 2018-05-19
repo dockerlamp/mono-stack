@@ -3,11 +3,12 @@ import * as _ from 'lodash';
 
 import { FrontConfigProvider } from '../../src/front/config/FrontConfigProvider';
 import { getTestLogger } from './helpers/getTestLogger';
+import { IFrontConfig } from '../front/config/IFrontConfig';
 
 export const TEST_LOG_FILENAME = 'test.log';
 
 describe('LoggerProxy', () => {
-    let testConfig;
+    let testConfig: IFrontConfig;
 
     beforeEach(async () => {
         let configProvider = Container.get(FrontConfigProvider);
@@ -21,8 +22,8 @@ describe('LoggerProxy', () => {
         testConfig.logger.transports.file.config.filename = TEST_LOG_FILENAME;
         let logger = getTestLogger(testConfig);
 
-        expect('file' in logger.transports).toBeTruthy();
-        expect('console' in logger.transports).toBeFalsy();
+        expect(logger.transports.file).toBeDefined();
+        expect(logger.transports.console).toBeUndefined();
     });
 
     it('should return logger with only console transport set', async () => {
@@ -30,8 +31,8 @@ describe('LoggerProxy', () => {
         testConfig.logger.transports.console.enabled = true;
         let logger = getTestLogger(testConfig);
 
-        expect('file' in logger.transports).toBeFalsy();
-        expect('console' in logger.transports).toBeTruthy();
+        expect(logger.transports.file).toBeUndefined();
+        expect(logger.transports.console).toBeDefined();
     });
 
     it('should return logger without transport set', async () => {
@@ -39,7 +40,7 @@ describe('LoggerProxy', () => {
         testConfig.logger.transports.console.enabled = false;
         let logger = getTestLogger(testConfig);
 
-        expect('file' in logger.transports).toBeFalsy();
-        expect('console' in logger.transports).toBeFalsy();
+        expect(logger.transports.file).toBeUndefined();
+        expect(logger.transports.console).toBeUndefined();
     });
 });
