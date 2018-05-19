@@ -1,17 +1,21 @@
+import { Container } from 'typedi';
+
 import {} from 'jest';
 import * as uuid from 'uuid';
 
 import { CommandBus } from './CommandBus';
 import { ICommand } from './ICommand';
 import { ICommandHandler } from './ICommandHandler';
+import { LoggerProxy } from '../../common/logger/LoggerProxy';
 
 const COMMAND_NAME = 'test';
 
 describe('Command bus', () => {
     let bus: CommandBus;
+    let logger = Container.get(LoggerProxy).getLogger();
 
     beforeEach(() => {
-        bus = new CommandBus();
+        bus = new CommandBus(logger);
     });
 
     it('should allow to receive sent command', async (done) => {

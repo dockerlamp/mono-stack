@@ -2,12 +2,14 @@ import { Service } from 'typedi';
 import * as _ from 'lodash';
 import * as uuid from 'uuid';
 import { Connection, Model } from 'mongoose';
+import * as winston from 'winston';
 
 import { ILoginUser } from '../service/ILoginUser';
 import { IUser, UserSchema, IUserDocument } from './IUser-types';
 import { IUserWrite } from './IUserWrite';
 import { IUserRead } from './IUserRead';
 import { UserModelFactory } from './UserModelFactory';
+import { Logger } from '../../../common/logger/Logger';
 
 export const USER_COLLECTION = 'user';
 
@@ -15,12 +17,15 @@ export const USER_COLLECTION = 'user';
 export class UserModel implements IUserWrite, IUserRead {
     private model: Model<IUserDocument>;
 
-    constructor( private connection: Connection ) {
+    constructor(
+        private connection: Connection,
+        @Logger() private logger: winston.Logger
+     ) {
         this.model = connection.model(USER_COLLECTION, UserSchema, USER_COLLECTION);
     }
 
     public async insertUser(userData: ILoginUser): Promise<IUserDocument> {
-        console.log('Saving user', userData);
+        this.logger.info('Saving user', userData);
         let writeModelUser = _.omit(userData, [ 'provider', 'providerUserId' ]) as IUser;
         _.set(writeModelUser, ['providerIds', userData.provider], userData.providerUserId);
         let user = await this.model.create(writeModelUser);

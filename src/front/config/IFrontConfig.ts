@@ -1,3 +1,5 @@
+import { FileTransportInstance, ConsoleTransportInstance } from 'winston';
+
 import { IMongoConfig } from '../../common/config/IMongoConfig';
 
 export interface IFrontConfig {
@@ -16,6 +18,18 @@ export interface IFrontConfig {
             clientID: string;
             clientSecret: string;
             callbackURL: string;
+        };
+    };
+    logger: {
+        transports: {
+            file?: {
+                config: FileTransportInstance;
+                enabled: boolean;
+            };
+            console?: {
+                config?: ConsoleTransportInstance;
+                enabled: boolean;
+            };
         };
     };
 }

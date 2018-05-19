@@ -1,26 +1,12 @@
-const consoleLogFunctionNames = [
-    'log',
-    'info',
-    'warn',
-    'error',
-    'debug',
-];
+import { Container } from 'typedi';
+import * as winston from 'winston';
 
-let defaultLoggerFunctions = {};
-consoleLogFunctionNames.forEach((logFunctionName) => {
-    consoleLogFunctionNames[logFunctionName] = console[logFunctionName];
-});
+import { LoggerProxy } from './LoggerProxy';
 
-export class Logger {
-    public static disableConsoleLogger() {
-        consoleLogFunctionNames.forEach((logFunctionName) => {
-            console[logFunctionName] = () => {
-                // disable log
-            };
-        });
-    }
-}
-
-if (process.env.DISABLE_CONSOLE_LOGGER) {
-    Logger.disableConsoleLogger();
+export function Logger() {
+    return (object: {}, propertyName: string, index?: number) => {
+        const loggerProxy = Container.get(LoggerProxy);
+        const logger = loggerProxy.getLogger();
+        Container.registerHandler({ object, propertyName, index, value: (containerInstance) => logger });
+    };
 }

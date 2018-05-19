@@ -26,6 +26,19 @@ let defaultConfig: IFrontConfig = {
             callbackURL: 'http://127.0.0.1:3000/login/github/callback',
         },
     },
+    logger: {
+        transports: {
+            file: {
+                config: {
+                    filename: `logs/monostack.log`,
+                },
+                enabled: false,
+            },
+            console: {
+                enabled: true,
+            },
+        },
+    },
 };
 
 export let config: IFrontConfig = rc(FRONT_APPLICATION_NAME, defaultConfig);
