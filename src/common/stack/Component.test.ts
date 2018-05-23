@@ -112,23 +112,32 @@ describe('Component', () => {
 
     it('root should have empty parent', () => {
         let component = new Component({ type: exampleType});
+        expect(component.getRoot()).toBe(component);
         expect(component.parent).toBeUndefined();
     });
 
-    it('child should have valid parent', () => {
+    it('children should have valid parent and root', () => {
         let initData: IComponent = {
             type: exampleType,
             children: [
-                {type: exampleType},
+                {
+                    type: exampleType,
+                    children: [
+                        { type: exampleType }
+                    ]
+                },
             ],
         };
         let component = new Component(initData);
         expect(component.children[0].parent).toBe(component);
+        expect(component.children[0].getRoot()).toBe(component);
+        expect(component.children[0].children[0].parent).toBe(component.children[0]);
+        expect(component.children[0].children[0].getRoot()).toBe(component);
     });
 });
 
 describe('Stack', () => {
-    it('sould have valid structure', () => {
+    it('should have valid structure', () => {
         let stack = new Stack({});
         expect(stack.type).toBe(ComponentType.Stack);
     });

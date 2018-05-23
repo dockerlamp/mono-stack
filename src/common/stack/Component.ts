@@ -11,7 +11,7 @@ export class Component implements IComponent {
     public type: ComponentType;
     public name: string;
     public description: string;
-    public children: IComponent[] = [];
+    public children: Component[] = [];
     public links: ILink[] = [];
     public ports: IPort[] = [];
     public parent: Component;
@@ -35,6 +35,15 @@ export class Component implements IComponent {
         if (!this.id) {
             this.id = uuid.v4();
         }
+    }
+
+    public getRoot(): IComponent {
+        let currentNode: IComponent = this;
+        while (currentNode.parent) {
+            currentNode = currentNode.parent;
+        }
+
+        return currentNode;
     }
 
     public toJSON(): any {
