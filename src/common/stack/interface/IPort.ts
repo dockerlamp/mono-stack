@@ -1,3 +1,4 @@
 export interface IPort {
-    port: number;
+    id?: string;
+    port?: number;
 }

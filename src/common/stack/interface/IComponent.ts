@@ -10,6 +10,7 @@ export interface IComponent {
     children?: IComponent[];
     links?: ILink[];
     ports?: IPort[];
+    parent?: IComponent;
 
     [customField: string]: any;
 }

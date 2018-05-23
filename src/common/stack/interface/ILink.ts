@@ -1,3 +1,4 @@
 export interface ILink {
-    componentId: string;
+    id?: string;
+    destinationId?: string;
 }
