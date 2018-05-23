@@ -1,12 +1,13 @@
 import {} from 'jest';
+import * as _ from 'lodash';
 
 import { Component } from './Component';
 import { ComponentType } from './interface/ComponentType';
-import { Stack } from './Stack';
 import { IComponent } from './interface/IComponent';
 
 const exampleType = ComponentType.Stack;
 const exampleId = 'id';
+const examplePort = 1234;
 
 describe('Component', () => {
     it('should not allow to create untyped component', () => {
@@ -18,6 +19,16 @@ describe('Component', () => {
     it('should not allow to create typed component', () => {
         let component = new Component({ type: exampleType});
         expect(component.type).toBe(exampleType);
+    });
+
+    it('children should be empty array when no children passed', () => {
+        let component = new Component({ type: exampleType});
+        expect(_.isArray(component.children)).toBeTruthy();
+        expect(component.children).toHaveLength(0);
+
+        component = new Component({ type: exampleType, children: []});
+        expect(_.isArray(component.children)).toBeTruthy();
+        expect(component.children).toHaveLength(0);
     });
 
     it('should have id', () => {
@@ -77,10 +88,10 @@ describe('Component', () => {
                 new Component({type: exampleType}),
             ],
         };
-        let stack = new Component(initData);
-        expect(stack.children).toHaveLength(initData.children.length);
-        expect(stack.children[0].type).toBe(initData.children[0].type);
-        expect(stack.children[0].id).toBe(initData.children[0].id);
+        let component = new Component(initData);
+        expect(component.children).toHaveLength(initData.children.length);
+        expect(component.children[0].type).toBe(initData.children[0].type);
+        expect(component.children[0].id).toBe(initData.children[0].id);
     });
 
     it('should allow to initialize with children components passed as plain object', () => {
@@ -134,12 +145,41 @@ describe('Component', () => {
         expect(component.children[0].children[0].parent).toBe(component.children[0]);
         expect(component.children[0].children[0].getRoot()).toBe(component);
     });
-});
 
-describe('Stack', () => {
-    it('should have valid structure', () => {
-        let stack = new Stack({});
-        expect(stack.type).toBe(ComponentType.Stack);
+    it('should ignore constructor parent param', () => {
+        let component = new Component({
+            type: exampleType,
+            parent: new Component({ type: exampleType })
+        });
+        expect(component.parent).toBeUndefined();
     });
 
+    it('should allow to set port', () => {
+        let component = new Component({
+            type: exampleType,
+            ports: [
+                { port: examplePort }
+            ]
+        });
+        expect(component.ports[0].port).toBe(examplePort);
+        expect(component.ports[0].id).toBeDefined();
+    });
+
+    it.skip('should not modify initialData', () => {
+        let initData: IComponent = {
+            type: exampleType,
+            children: [
+                {
+                    type: exampleType,
+                    children: [
+                        { type: exampleType }
+                    ]
+                },
+            ],
+        };
+        let initialDataClone = _.cloneDeep(initData);
+        expect(initData).toMatchObject(initialDataClone);
+        let component = new Component(initialDataClone);
+        expect(initData).toMatchObject(initialDataClone);
+    });
 });

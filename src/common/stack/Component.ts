@@ -22,23 +22,19 @@ export class Component implements IComponent {
         if (!initialData.type) {
             throw new Error('Unknown type');
         }
-        // transform children into Component array
-        if (_.isArray(initialData.children)) {
-            initialData.children = initialData.children.map((childData) => {
-                return new Component({
-                    ...childData,
-                    parent: this,
-                });
-            });
-        }
-        Object.assign(this, initialData);
+        // parent can not be overwriten by constructor params
+        let { parent, children, ports, ...writableFields } = initialData;
+        Object.assign(this, writableFields);
         if (!this.id) {
             this.id = uuid.v4();
         }
+        // transform children into Component array
+        this.assignChildren(children);
+        this.assignPorts(ports);
     }
 
-    public getRoot(): IComponent {
-        let currentNode: IComponent = this;
+    public getRoot(): Component {
+        let currentNode: Component = this;
         while (currentNode.parent) {
             currentNode = currentNode.parent;
         }
@@ -48,5 +44,28 @@ export class Component implements IComponent {
 
     public toJSON(): any {
         return _.omit(this, 'parent');
+    }
+
+    private assignChildren(children: IComponent[]) {
+        if (!_.isArray(children)) {
+            return; // ---->
+        }
+        this.children = children.map((childData) => {
+            let child = new Component(childData);
+            child.parent = this;
+            return child;
+        });
+    }
+
+    private assignPorts(ports: IPort[]) {
+        if (!_.isArray(ports)) {
+            return; // ---->
+        }
+        this.ports = ports.map((port) => {
+            if (!port.id) {
+                port.id = uuid.v4();
+            }
+            return port;
+        });
     }
 }
