@@ -55,6 +55,9 @@ describe('Component', () => {
             children: [
                 new Component({type: exampleType}),
             ],
+            ports: [
+                { port: examplePort }
+            ]
         });
         let serializedComponentJsonString = JSON.stringify(component);
         let serializedComponentJsonObject = JSON.parse(serializedComponentJsonString);
@@ -64,6 +67,7 @@ describe('Component', () => {
         expect(unserializedComponent.type).toBe(component.type);
         expect(unserializedComponent.custom).toBe(component.custom);
         expect(unserializedComponent.children).toHaveLength(component.children.length);
+        expect(unserializedComponent.ports).toHaveLength(component.ports.length);
     });
 
     it('should serialize without parent', () => {
@@ -163,6 +167,103 @@ describe('Component', () => {
         });
         expect(component.ports[0].port).toBe(examplePort);
         expect(component.ports[0].id).toBeDefined();
+    });
+
+    it('should not allow to set port without number', () => {
+        expect(() => {
+            let component = new Component({
+                type: exampleType,
+                ports: [
+                    { }
+                ]
+            });
+        }).toThrow();
+    });
+
+    it('should allow to configure links between components', () => {
+        let component = new Component({
+            type: exampleType,
+            children: [
+                {
+                    id: '1',
+                    type: exampleType,
+                },
+                {
+                    type: exampleType,
+                    links: [
+                        {destinationId: '1'}
+                    ]
+                }
+            ],
+        });
+        expect(component.children[1].links[0].destinationId).toBe(component.children[0].id);
+    });
+
+    it('validate should not return errors for valid structure', () => {
+        let component = new Component({
+            type: exampleType,
+            children: [
+                {
+                    id: '1',
+                    type: exampleType,
+                    ports: [
+                        { port: examplePort }
+                    ]
+                },
+                {
+                    type: exampleType,
+                    links: [
+                        {destinationId: '1'}
+                    ],
+                }
+            ],
+        });
+        let errors = component.validate();
+        expect(errors).toHaveLength(0);
+    });
+
+    it('validate should return error when id was nullified', () => {
+        let component = new Component({
+            type: exampleType,
+            children: [
+                {
+                    type: exampleType,
+                },
+            ],
+        });
+        component.children[0].id = null;
+        let errors = component.validate();
+        expect(errors).toHaveLength(1);
+    });
+
+    it('validate should return error when id is dupplicated', () => {
+        let component = new Component({
+            type: exampleType,
+            children: [
+                {
+                    type: exampleType,
+                },
+            ],
+        });
+        component.children[0].id = component.id;
+        let errors = component.validate();
+        expect(errors).toHaveLength(1);
+    });
+
+    it('validate should return error when link.destinationId does not exists', () => {
+        let component = new Component({
+            type: exampleType,
+            children: [
+                {
+                    type: exampleType,
+                    links: [
+                        {destinationId: 'wrong'}
+                    ],
+                },
+            ],
+        });
+        let errors = component.validate();
+        expect(errors).toHaveLength(1);
     });
 
     it.skip('should not modify initialData', () => {
