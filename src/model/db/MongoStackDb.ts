@@ -4,15 +4,15 @@ import * as winston from 'winston';
 import * as _ from 'lodash';
 
 import { Logger } from '../../common/logger/Logger';
-import { MongoControllerFactory } from './MongoControllerFactory';
-import { IDbController } from './IDbController';
+import { MongoStackDbFactory } from './MongoStackDbFactory';
+import { IStackDb } from './IStackDb';
 import { IComponent } from '../../common/stack/interface/IComponent';
 import { ComponentSchema } from './ComponentSchema';
 
 export const COMPONENT_COLLECTION = 'component';
 
-@Service({ factory: [MongoControllerFactory, 'create']})
-export class MongoController implements IDbController {
+@Service({ factory: [MongoStackDbFactory, 'create']})
+export class MongoStackDb implements IStackDb {
     private model;
 
     constructor(

@@ -2,11 +2,11 @@ import { Service } from 'typedi';
 import * as winston from 'winston';
 
 import { Logger } from '../../common/logger/Logger';
-import { MongoController } from './MongoController';
+import { MongoStackDb } from './MongoStackDb';
 import { MongoConnection } from './MongoConnection';
 
 @Service()
-export class MongoControllerFactory {
+export class MongoStackDbFactory {
     constructor(
         private mongoConnection: MongoConnection,
         @Logger() private logger: winston.Logger,
@@ -14,6 +14,6 @@ export class MongoControllerFactory {
     }
 
     public create() {
-        return new MongoController(this.mongoConnection.getConnection(), this.logger);
+        return new MongoStackDb(this.mongoConnection.getConnection(), this.logger);
     }
 }

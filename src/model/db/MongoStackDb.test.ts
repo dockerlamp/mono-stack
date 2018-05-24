@@ -2,9 +2,9 @@ import {} from 'jest';
 import * as _ from 'lodash';
 
 import { getTestDbContainer } from '../../../test/integration/helpers/getTestDbContainer';
-import { MongoController } from './MongoController';
+import { MongoStackDb } from './MongoStackDb';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
-import { MongoControllerFactory } from './MongoControllerFactory';
+import { MongoStackDbFactory } from './MongoStackDbFactory';
 import { IComponent } from '../../common/stack/interface/IComponent';
 import { Component } from '../../common/stack/Component';
 import { ComponentType } from '../../common/stack/interface/ComponentType';
@@ -13,8 +13,8 @@ const exampleType = ComponentType.Stack;
 const exampleType2 = ComponentType.Service;
 export const COMPONENT_COLLECTION = 'component';
 
-describe('MongoController', () => {
-    let mongoController: MongoController;
+describe('MongoStackDb', () => {
+    let mongoStackDb: MongoStackDb;
     let testDbContainer;
     let connection;
 
@@ -38,7 +38,7 @@ describe('MongoController', () => {
     beforeAll(async () => {
         testDbContainer = getTestDbContainer();
         connection = testDbContainer.get(MongoConnection).getConnection();
-        mongoController = testDbContainer.get(MongoControllerFactory).create();
+        mongoStackDb = testDbContainer.get(MongoStackDbFactory).create();
         testDbContainer.reset();
     });
 
@@ -51,21 +51,21 @@ describe('MongoController', () => {
     });
 
     it('should insert component', async () => {
-        let dbComponent = await mongoController.insertComponent(component);
+        let dbComponent = await mongoStackDb.insertComponent(component);
         expectDbComponentEqualsComponent(dbComponent, component);
     });
 
     it('should get component by id', async () => {
-        await mongoController.insertComponent(component);
-        let dbComponent = await mongoController.getComponentById(component.id);
+        await mongoStackDb.insertComponent(component);
+        let dbComponent = await mongoStackDb.getComponentById(component.id);
         expectDbComponentEqualsComponent(dbComponent, component);
     });
 
     it('should update existing component', async () => {
-        await mongoController.insertComponent(component);
+        await mongoStackDb.insertComponent(component);
         component.customValue = 'customValue'; // new property
         component.children[0].type = exampleType; // change propery
-        let updatedDbComponent = await mongoController.insertComponent(component);
+        let updatedDbComponent = await mongoStackDb.insertComponent(component);
         expectDbComponentEqualsComponent(updatedDbComponent, component);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
 
