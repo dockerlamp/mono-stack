@@ -3,7 +3,7 @@ import * as winston from 'winston';
 
 import { Logger } from '../../common/logger/Logger';
 import { Stack } from '../../common/stack/Stack';
-import { MongoStackDb } from '../../model/db/MongoStackDb';
+import { IStackDb } from '../../model/db/IStackDb';
 import { MongoStackDbFactory } from '../../model/db/MongoStackDbFactory';
 import { Error } from 'mongoose';
 
@@ -13,7 +13,7 @@ export class StackRepository {
     // @TODO use as cache (collection) for stack instances?
     private stackCollection: Stack[];
 
-    private dbContext: MongoStackDb;
+    private dbContext: IStackDb;
 
     constructor(
         private mongoStackDbFactory: MongoStackDbFactory,
