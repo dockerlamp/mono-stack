@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Model, Connection } from 'mongoose';
+import { Model, Connection, Query } from 'mongoose';
 import * as winston from 'winston';
 import * as _ from 'lodash';
 
@@ -27,10 +27,16 @@ export class MongoStackDb implements IStackDb {
         let serializedComponentObject = JSON.parse(serializedComponent);
         let query = await this.model.findOneAndUpdate({id: component.id},
             serializedComponentObject, {upsert: true, new: true});
-        return await query;
+        return this.mongooseQueryToObject(query);
     }
 
     public async getComponentById(id: string): Promise<IComponent> {
-        return await this.model.findOne({id: id});
+        let query = await this.model.findOne({id: id});
+        return this.mongooseQueryToObject(query);
+    }
+
+    private mongooseQueryToObject(query: Query<any>): object {
+        let queryAsObject = query.toObject();
+        return _.omit(queryAsObject, ['_id', '__v']);
     }
 }

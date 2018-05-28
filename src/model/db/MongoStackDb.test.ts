@@ -28,8 +28,6 @@ describe('MongoStackDb', () => {
     });
 
     let expectDbComponentEqualsComponent = (dbComponent: IComponent, component: IComponent) => {
-        dbComponent = dbComponent.toObject();
-        dbComponent = _.omit(dbComponent, ['_id', '__v']);
         let serializedDbComponentJsonString = JSON.stringify(dbComponent, Object.keys(dbComponent).sort());
         let serializedComponentJsonString = JSON.stringify(component, Object.keys(component).sort());
         expect(serializedDbComponentJsonString).toBe(serializedComponentJsonString);
@@ -68,6 +66,5 @@ describe('MongoStackDb', () => {
         let updatedDbComponent = await mongoStackDb.insertComponent(component);
         expectDbComponentEqualsComponent(updatedDbComponent, component);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
-
     });
 });
