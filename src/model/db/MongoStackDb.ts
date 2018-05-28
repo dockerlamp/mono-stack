@@ -22,7 +22,7 @@ export class MongoStackDb implements IStackDb {
         this.model = connection.model(COMPONENT_COLLECTION, ComponentSchema, COMPONENT_COLLECTION);
     }
 
-    public async insertComponent(component: IComponent): Promise<IComponent> {
+    public async insertOrUpdateComponent(component: IComponent): Promise<IComponent> {
         let serializedComponent = JSON.stringify(component);
         let serializedComponentObject = JSON.parse(serializedComponent);
         let query = await this.model.findOneAndUpdate({id: component.id},

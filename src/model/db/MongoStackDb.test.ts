@@ -49,21 +49,21 @@ describe('MongoStackDb', () => {
     });
 
     it('should insert component', async () => {
-        let dbComponent = await mongoStackDb.insertComponent(component);
+        let dbComponent = await mongoStackDb.insertOrUpdateComponent(component);
         expectDbComponentEqualsComponent(dbComponent, component);
     });
 
     it('should get component by id', async () => {
-        await mongoStackDb.insertComponent(component);
+        await mongoStackDb.insertOrUpdateComponent(component);
         let dbComponent = await mongoStackDb.getComponentById(component.id);
         expectDbComponentEqualsComponent(dbComponent, component);
     });
 
     it('should update existing component', async () => {
-        await mongoStackDb.insertComponent(component);
+        await mongoStackDb.insertOrUpdateComponent(component);
         component.customValue = 'customValue'; // new property
         component.children[0].type = exampleType; // change propery
-        let updatedDbComponent = await mongoStackDb.insertComponent(component);
+        let updatedDbComponent = await mongoStackDb.insertOrUpdateComponent(component);
         expectDbComponentEqualsComponent(updatedDbComponent, component);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
