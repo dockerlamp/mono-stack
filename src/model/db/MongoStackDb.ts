@@ -1,5 +1,5 @@
 import { Service } from 'typedi';
-import { Model, Connection, Query } from 'mongoose';
+import { Model, Connection } from 'mongoose';
 import * as winston from 'winston';
 import * as _ from 'lodash';
 
@@ -35,7 +35,7 @@ export class MongoStackDb implements IStackDb {
         return this.mongooseQueryToObject(query);
     }
 
-    private mongooseQueryToObject(query: Query<any>): object {
+    private mongooseQueryToObject(query): object {
         let queryAsObject = query.toObject();
         return _.omit(queryAsObject, ['_id', '__v']);
     }
