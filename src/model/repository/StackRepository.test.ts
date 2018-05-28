@@ -4,6 +4,7 @@ import { getTestDbContainer } from '../../../test/integration/helpers/getTestDbC
 import { Stack } from '../../common/stack/Stack';
 import { ComponentType } from '../../common/stack/interface/ComponentType';
 import { MongoStackDbFactory } from '../../model/db/MongoStackDbFactory';
+import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { StackRepository } from '../../model/repository/StackRepository';
 import { componentsEqual } from '../../../test/integration/helpers/componentsEqual';
 
@@ -27,8 +28,17 @@ describe('StackRepository', () => {
 
     beforeAll(async () => {
         testDbContainer = getTestDbContainer();
+        connection = testDbContainer.get(MongoConnection).getConnection();
         stackRepository = testDbContainer.get(StackRepository);
         testDbContainer.reset();
+    });
+
+    beforeEach(async () => {
+        await connection.collection(COMPONENT_COLLECTION).deleteMany({});
+    });
+
+    afterEach(async () => {
+        await connection.collection(COMPONENT_COLLECTION).deleteMany({});
     });
 
     it('should insert stack', async () => {
