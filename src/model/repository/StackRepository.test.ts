@@ -7,6 +7,7 @@ import { MongoStackDbFactory } from '../../model/db/MongoStackDbFactory';
 import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { StackRepository } from '../../model/repository/StackRepository';
 import { componentsEqual } from '../../../test/integration/helpers/componentsEqual';
+import { IComponent } from '../../common/stack/interface/IComponent';
 
 const exampleType = ComponentType.Stack;
 const exampleType2 = ComponentType.Service;
@@ -50,5 +51,18 @@ describe('StackRepository', () => {
         await stackRepository.add(stack);
         let repoStack = await stackRepository.findbyId(stack.id);
         expect(componentsEqual(repoStack, stack)).toBeTruthy();
+    });
+
+    it('should create new stack from stack data', async () => {
+        let stackData: IComponent = {
+            type: exampleType,
+            children: [
+                {
+                    type: exampleType2,
+                },
+            ],
+        };
+        let stack = stackRepository.create(stackData);
+        expect(stack).toBeInstanceOf(Stack);
     });
 });

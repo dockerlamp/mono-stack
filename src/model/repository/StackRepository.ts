@@ -6,6 +6,7 @@ import { Stack } from '../../common/stack/Stack';
 import { IStackDb } from '../../model/db/IStackDb';
 import { MongoStackDbFactory } from '../../model/db/MongoStackDbFactory';
 import { Error } from 'mongoose';
+import { IComponent } from '../../common/stack/interface/IComponent';
 
 // @TODO make common interface for all repositories?
 @Service()
@@ -28,5 +29,13 @@ export class StackRepository {
     public async findbyId(stackId: string): Promise<Stack> {
         let component = await this.dbContext.getComponentById(stackId);
         return new Stack(component);
+    }
+
+    public create(stackData: IComponent): Stack {
+        let stack = new Stack(stackData);
+        let errors = stack.validate();
+        if ( errors.length > 0 ) {
+            throw new Error(`stack data validation failed on behalf of ${errors}`); }
+        return stack;
     }
 }
