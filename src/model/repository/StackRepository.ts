@@ -20,8 +20,9 @@ export class StackRepository {
         this.dbContext = this.mongoStackDbFactory.create();
     }
 
-    public async add(stack: Stack): Promise<void> {
+    public async add(stack: Stack): Promise<string> {
         await this.dbContext.insertOrUpdate(stack);
+        return stack.id;
     }
 
     public async findbyId(stackId: string): Promise<Stack> {

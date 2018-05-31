@@ -40,7 +40,9 @@ describe('MongoStackDb', () => {
     });
 
     it('should insert component', async () => {
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toBeUndefined();
         let dbComponent = await mongoStackDb.insertOrUpdate(component);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
         expect(componentsEqual(dbComponent, component)).toBeTruthy();
     });
 
