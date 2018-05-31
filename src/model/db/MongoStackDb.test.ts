@@ -8,10 +8,7 @@ import { MongoStackDbFactory } from './MongoStackDbFactory';
 import { Component } from '../../common/stack/Component';
 import { ComponentType } from '../../common/stack/interface/ComponentType';
 import { componentsEqual } from '../../../test/integration/helpers/componentsEqual';
-
-const exampleType = ComponentType.Stack;
-const exampleType2 = ComponentType.Service;
-export const COMPONENT_COLLECTION = 'component';
+import { COMPONENT_COLLECTION } from '../../../src/model/db/MongoStackDb';
 
 describe('MongoStackDb', () => {
     let mongoStackDb: MongoStackDb;
@@ -19,10 +16,10 @@ describe('MongoStackDb', () => {
     let connection;
 
     let component = new Component({
-        type: exampleType,
+        type: ComponentType.Stack,
         children: [
             new Component({
-                type: exampleType2,
+                type: ComponentType.Service,
             }),
         ],
     });
@@ -43,21 +40,21 @@ describe('MongoStackDb', () => {
     });
 
     it('should insert component', async () => {
-        let dbComponent = await mongoStackDb.insertOrUpdateComponent(component);
+        let dbComponent = await mongoStackDb.insertOrUpdate(component);
         expect(componentsEqual(dbComponent, component)).toBeTruthy();
     });
 
-    it('should get component by id', async () => {
-        await mongoStackDb.insertOrUpdateComponent(component);
-        let dbComponent = await mongoStackDb.getComponentById(component.id);
+    it('should get inserted component by id', async () => {
+        await mongoStackDb.insertOrUpdate(component);
+        let dbComponent = await mongoStackDb.getById(component.id);
         expect(componentsEqual(dbComponent, component)).toBeTruthy();
     });
 
     it('should update existing component', async () => {
-        await mongoStackDb.insertOrUpdateComponent(component);
+        await mongoStackDb.insertOrUpdate(component);
         component.customValue = 'customValue'; // new property
-        component.children[0].type = exampleType; // change propery
-        let updatedDbComponent = await mongoStackDb.insertOrUpdateComponent(component);
+        component.children[0].type = ComponentType.Stack; // change propery
+        let updatedDbComponent = await mongoStackDb.insertOrUpdate(component);
         expect(componentsEqual(updatedDbComponent, component)).toBeTruthy();
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });

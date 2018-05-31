@@ -8,10 +8,7 @@ import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { StackRepository } from '../../model/repository/StackRepository';
 import { componentsEqual } from '../../../test/integration/helpers/componentsEqual';
 import { IComponent } from '../../common/stack/interface/IComponent';
-
-const exampleType = ComponentType.Stack;
-const exampleType2 = ComponentType.Service;
-export const COMPONENT_COLLECTION = 'component';
+import { COMPONENT_COLLECTION } from '../../../src/model/db/MongoStackDb';
 
 describe('StackRepository', () => {
     let testDbContainer;
@@ -19,10 +16,10 @@ describe('StackRepository', () => {
     let connection;
 
     let stack = new Stack({
-        type: exampleType,
+        type: ComponentType.Stack,
         children: [
             new Stack({
-                type: exampleType2,
+                type: ComponentType.Service,
             }),
         ],
     });
@@ -55,10 +52,10 @@ describe('StackRepository', () => {
 
     it('should create new stack from stack data', async () => {
         let stackData: IComponent = {
-            type: exampleType,
+            type: ComponentType.Stack,
             children: [
                 {
-                    type: exampleType2,
+                    type: ComponentType.Service,
                 },
             ],
         };

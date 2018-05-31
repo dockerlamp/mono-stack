@@ -11,23 +11,21 @@ import { IComponent } from '../../common/stack/interface/IComponent';
 // @TODO make common interface for all repositories?
 @Service()
 export class StackRepository {
-    // @TODO use as cache (collection) for stack instances?
-    private stackCollection: Stack[];
 
     private dbContext: IStackDb;
 
     constructor(
-        private mongoStackDbFactory: MongoStackDbFactory,
-        @Logger() private logger: winston.Logger) {
+        private mongoStackDbFactory: MongoStackDbFactory
+    ) {
         this.dbContext = this.mongoStackDbFactory.create();
     }
 
     public async add(stack: Stack): Promise<void> {
-        await this.dbContext.insertOrUpdateComponent(stack);
+        await this.dbContext.insertOrUpdate(stack);
     }
 
     public async findbyId(stackId: string): Promise<Stack> {
-        let component = await this.dbContext.getComponentById(stackId);
+        let component = await this.dbContext.getById(stackId);
         return new Stack(component);
     }
 

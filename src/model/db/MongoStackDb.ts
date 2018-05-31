@@ -16,13 +16,12 @@ export class MongoStackDb implements IStackDb {
     private model;
 
     constructor(
-        private connection: Connection,
-        @Logger() private logger: winston.Logger
-     ) {
+        private connection: Connection
+    ) {
         this.model = connection.model(COMPONENT_COLLECTION, ComponentSchema, COMPONENT_COLLECTION);
     }
 
-    public async insertOrUpdateComponent(component: IComponent): Promise<IComponent> {
+    public async insertOrUpdate(component: IComponent): Promise<IComponent> {
         let serializedComponent = JSON.stringify(component);
         let serializedComponentObject = JSON.parse(serializedComponent);
         let query = await this.model.findOneAndUpdate({id: component.id},
@@ -30,8 +29,8 @@ export class MongoStackDb implements IStackDb {
         return this.mongooseQueryToObject(query);
     }
 
-    public async getComponentById(id: string): Promise<IComponent> {
-        let query = await this.model.findOne({id: id});
+    public async getById(id: string): Promise<IComponent> {
+        let query = await this.model.findOne({id});
         return this.mongooseQueryToObject(query);
     }
 
