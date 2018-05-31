@@ -5,14 +5,13 @@ import * as _ from 'lodash';
 
 import { Logger } from '../../common/logger/Logger';
 import { MongoStackDbFactory } from './MongoStackDbFactory';
-import { IStackDb } from './IStackDb';
 import { IComponent } from '../../common/stack/interface/IComponent';
 import { ComponentSchema } from './ComponentSchema';
 
 export const COMPONENT_COLLECTION = 'component';
 
 @Service({ factory: [MongoStackDbFactory, 'create']})
-export class MongoStackDb implements IStackDb {
+export class MongoStackDb {
     private model;
 
     constructor(
