@@ -31,7 +31,7 @@ describe('Component', () => {
         expect(component.children).toHaveLength(0);
     });
 
-    it('should have id', () => {
+    it('should have auto-generated id', () => {
         let component = new Component({ type: exampleType});
         expect(component.id).toBeDefined();
     });
@@ -262,6 +262,18 @@ describe('Component', () => {
                 },
             ],
         });
+        let errors = component.validate();
+        expect(errors).toHaveLength(1);
+    });
+
+    it('validate should return error when port has wrong value', () => {
+        let component = new Component({
+            type: exampleType,
+            ports: [
+                { port: 1 },
+            ]
+        });
+        component.ports[0].port = -1;
         let errors = component.validate();
         expect(errors).toHaveLength(1);
     });

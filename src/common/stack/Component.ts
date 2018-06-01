@@ -5,6 +5,11 @@ import { IComponent } from './interface/IComponent';
 import { ComponentType } from './interface/ComponentType';
 import { ILink } from './interface/ILink';
 import { IPort } from './interface/IPort';
+import { ComponentError } from './ComponentError';
+
+interface IIdsList {
+    [key: string]: boolean;
+}
 
 export class Component implements IComponent {
     public id: string;
@@ -20,7 +25,7 @@ export class Component implements IComponent {
 
     constructor(initialData: IComponent) {
         if (!initialData.type) {
-            throw new Error('Unknown type');
+            throw new ComponentError('Empty component type');
         }
         // parent can not be overwriten by constructor params
         let { parent, children, links, ports, ...writableFields } = initialData;
@@ -56,39 +61,66 @@ export class Component implements IComponent {
 
     public validate(): string[] {
         let errors: string[] = [];
-        let ids: any = {};
-        for (let component of this.walk()) {
-            if (!component.id) {
-                errors.push(`Component without id ${component.type}/${component.name}`);
+        try {
+            let ids: IIdsList = this.getAllIds(); // get list and thorw error if dupplication found
+            for (let component of this.walk()) {
+                this.validateComponent(component, errors);
+                this.validateComponentLinks(component, ids, errors);
+                this.validateComponentPorts(component, errors);
             }
+        } catch (error) {
+            if (error instanceof ComponentError) {
+                errors.push(error.message);
+            } else {
+                throw error;
+            }
+        }
+
+        return errors;
+    }
+
+    private getAllIds(): IIdsList {
+        let ids: IIdsList = {};
+        for (let component of this.getRoot().walk()) {
             if (ids[component.id]) {
-                errors.push(`Dupplicated id ${component.id}`);
+                throw new ComponentError(`Dupplicated id ${component.id}`);
             }
             ids[component.id] = true;
         }
 
-        for (let component of this.walk()) {
-            for (let link of component.links) {
-                if (!link.id) {
-                    errors.push(`Link without id ${component.id}/${link.destinationId}`);
-                }
-                if (!link.destinationId) {
-                    errors.push(`Link without destinationId ${component.id}/${link.id}`);
-                }
-                if (!ids[link.destinationId]) {
-                    errors.push(`Link destinationId does not exists ${component.id}/${link.destinationId}`);
-                }
+        return ids;
+    }
+
+    private validateComponent(component: Component, errors: string[]) {
+        if (!component.id) {
+            errors.push(`Component without id ${component.type}/${component.name}`);
+        }
+    }
+
+    private validateComponentPorts(component: Component, errors: string[]) {
+        for (let port of component.ports) {
+            if (!port.id) {
+                errors.push(`Port without id ${component.id}/${port.port}`);
             }
-            for (let port of component.ports) {
-                if (!port.id) {
-                    errors.push(`Port without id ${component.id}/${port.port}`);
-                }
-                if (!port.port) {
-                    errors.push(`Port without number ${component.id}/${port.id}`);
-                }
+
+            if (! ((port.port > 0) && (port.port < 65635) ) ) {
+                errors.push(`Wrong port number ${component.id}/${port.id}`);
             }
         }
-        return errors;
+    }
+
+    private validateComponentLinks(component: Component, ids: IIdsList, errors: string[]) {
+        for (let link of component.links) {
+            if (!link.id) {
+                errors.push(`Link without id ${component.id}/${link.destinationId}`);
+            }
+            if (!link.destinationId) {
+                errors.push(`Link without destinationId ${component.id}/${link.id}`);
+            }
+            if (!ids[link.destinationId]) {
+                errors.push(`Link destinationId does not exists ${component.id}/${link.destinationId}`);
+            }
+        }
     }
 
     private assignChildren(children: IComponent[]) {
@@ -108,7 +140,7 @@ export class Component implements IComponent {
         }
         this.ports = ports.map((port) => {
             if (!port.port) {
-                throw new Error('Empty port number');
+                throw new ComponentError('Empty port number');
             }
             if (!port.id) {
                 port.id = uuid.v4();
@@ -123,7 +155,7 @@ export class Component implements IComponent {
         }
         this.links = links.map((link) => {
             if (!link.destinationId) {
-                throw new Error('Empty link destinationId');
+                throw new ComponentError('Empty link destinationId');
             }
             if (!link.id) {
                 link.id = uuid.v4();
