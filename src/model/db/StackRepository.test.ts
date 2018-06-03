@@ -39,13 +39,17 @@ describe('StackRepository', () => {
         await connection.collection(COMPONENT_COLLECTION).deleteMany({});
     });
 
-    let compare = (beforeComponent, afterComponent) => {
+    let compare = (firstComponent, secondComponent) => {
         // eliminate circular references for compare
-        removeParents(beforeComponent);
-        removeParents(afterComponent);
-        // eliminate specific info added by mongoose for compare
-        expect(_.omit(beforeComponent, ['"$setOnInsert"'])).toMatchObject(
-            _.omit(afterComponent, ['__v', '_id']));
+        removeParents(firstComponent);
+        removeParents(secondComponent);
+        // eliminate specific attribues added by mongoose for compare
+        let attributes = ['__v', '_id', '$setOnInsert'];
+
+        expect(_.omit(firstComponent, attributes)).toMatchObject(
+            _.omit(secondComponent, attributes));
+        expect(_.omit(secondComponent, attributes)).toMatchObject(
+            _.omit(firstComponent, attributes));
     };
 
     it('should insert component', async () => {
@@ -73,5 +77,16 @@ describe('StackRepository', () => {
         let componentAfterUpdate = await stackRepository.insertOrUpdate(componentAfterInsert);
         compare(componentAfterInsert, componentAfterUpdate);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+    });
+
+    it('should handle multiple insertion of the same component', async () => {
+        let componentBeforeInsert = _.cloneDeep(component);
+        let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+
+        let componentAfterSecondInsert = await stackRepository.insertOrUpdate(componentAfterInsert);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+
+        compare(componentBeforeInsert, componentAfterSecondInsert);
     });
 });
