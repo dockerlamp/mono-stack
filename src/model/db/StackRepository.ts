@@ -7,7 +7,7 @@ import { Logger } from '../../common/logger/Logger';
 import { StackRepositoryFactory } from './StackRepositoryFactory';
 import { IComponent } from '../../common/stack/interface/IComponent';
 import { Component } from '../../common/stack/Component';
-import { ComponentSchema } from './ComponentSchema';
+import { StackSchema } from './StackSchema';
 
 export const COMPONENT_COLLECTION = 'component';
 
@@ -18,7 +18,7 @@ export class StackRepository {
     constructor(
         private connection: Connection
     ) {
-        this.model = connection.model(COMPONENT_COLLECTION, ComponentSchema, COMPONENT_COLLECTION);
+        this.model = connection.model(COMPONENT_COLLECTION, StackSchema, COMPONENT_COLLECTION);
     }
 
     public async insertOrUpdate(component: IComponent): Promise<IComponent> {
