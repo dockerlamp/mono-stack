@@ -1,17 +1,17 @@
 import {} from 'jest';
 import * as _ from 'lodash';
 
-import { getTestDbContainer } from '../../../test/integration/helpers/getTestDbContainer';
-import { removeParents } from '../../../test/integration/helpers/removeParents';
-import { MongoConnection } from '../../../src/model/db/MongoConnection';
-import { COMPONENT_COLLECTION } from '../../../src/model/db/StackRepository';
+import { getTestDbContainer } from '../../../../test/integration/helpers/getTestDbContainer';
+import { removeParents } from '../../../../test/integration/helpers/removeParents';
+import { MongoConnection } from '../../../../src/model/db/MongoConnection';
+import { COMPONENT_COLLECTION } from '../../../../src/model/db/StackRepository';
 
-import { Stack } from './Stack';
+import { Stack } from './../Stack';
 import { StackService } from './StackService';
-import { ComponentType } from './interface/ComponentType';
-import { Component } from './Component';
-import { ILoginUser } from '../../model/user/service/ILoginUser';
-import { UserService } from '../../model/user/service/UserService';
+import { ComponentType } from './../interface/ComponentType';
+import { Component } from './../Component';
+import { ILoginUser } from '../../../model/user/service/ILoginUser';
+import { UserService } from '../../../model/user/service/UserService';
 
 let user: ILoginUser = {
     email: 'foo@bar.com',

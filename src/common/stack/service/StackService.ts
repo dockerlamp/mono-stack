@@ -1,8 +1,8 @@
 import { Service } from 'typedi';
 
-import { Stack } from './Stack';
-import { IUser } from '../../model/user/model/IUser-types';
-import { StackRepository } from '../../model/db/StackRepository';
+import { Stack } from './../Stack';
+import { IUser } from '../../../model/user/model/IUser-types';
+import { StackRepository } from '../../../model/db/StackRepository';
 
 @Service()
 export class StackService {
