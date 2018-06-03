@@ -6,6 +6,7 @@ import * as _ from 'lodash';
 import { Logger } from '../../common/logger/Logger';
 import { StackRepositoryFactory } from './StackRepositoryFactory';
 import { IComponent } from '../../common/stack/interface/IComponent';
+import { Component } from '../../common/stack/Component';
 import { ComponentSchema } from './ComponentSchema';
 
 export const COMPONENT_COLLECTION = 'component';
@@ -21,10 +22,11 @@ export class StackRepository {
     }
 
     public async insertOrUpdate(component: IComponent): Promise<IComponent> {
-        let serializedComponent = JSON.stringify(component);
-        let serializedComponentObject = JSON.parse(serializedComponent);
+        for (let element of component.walk()) {
+            delete element.parent;
+        }
         let query = await this.model.findOneAndUpdate({id: component.id},
-            serializedComponentObject, {upsert: true, new: true});
+            component, {upsert: true, new: true});
         return this.mongooseQueryToObject(query);
     }
 
@@ -33,8 +35,7 @@ export class StackRepository {
         return this.mongooseQueryToObject(query);
     }
 
-    private mongooseQueryToObject(query): object {
-        let queryAsObject = query.toObject();
-        return _.omit(queryAsObject, ['_id', '__v']);
+    private mongooseQueryToObject(query): IComponent {
+        return new Component(query.toObject());
     }
 }

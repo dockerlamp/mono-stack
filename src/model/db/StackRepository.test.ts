@@ -7,7 +7,7 @@ import { MongoConnection } from '../../../src/model/db/MongoConnection';
 import { StackRepositoryFactory } from './StackRepositoryFactory';
 import { Component } from '../../common/stack/Component';
 import { ComponentType } from '../../common/stack/interface/ComponentType';
-import { componentsEqual } from '../../../test/integration/helpers/componentsEqual';
+import { removeParents } from '../../../test/integration/helpers/removeParents';
 import { COMPONENT_COLLECTION } from '../../../src/model/db/StackRepository';
 
 describe('StackRepository', () => {
@@ -39,25 +39,39 @@ describe('StackRepository', () => {
         await connection.collection(COMPONENT_COLLECTION).deleteMany({});
     });
 
+    let compare = (beforeComponent, afterComponent) => {
+        // eliminate circular references for compare
+        removeParents(beforeComponent);
+        removeParents(afterComponent);
+        // eliminate specific info added by mongoose for compare
+        expect(_.omit(beforeComponent, ['"$setOnInsert"'])).toMatchObject(
+            _.omit(afterComponent, ['__v', '_id']));
+    };
+
     it('should insert component', async () => {
+        let componentBeforeInsert = _.cloneDeep(component);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toBeUndefined();
-        let dbComponent = await stackRepository.insertOrUpdate(component);
+        let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
-        expect(componentsEqual(dbComponent, component)).toBeTruthy();
+        compare(componentBeforeInsert, componentAfterInsert);
     });
 
     it('should get inserted component by id', async () => {
-        await stackRepository.insertOrUpdate(component);
-        let dbComponent = await stackRepository.getById(component.id);
-        expect(componentsEqual(dbComponent, component)).toBeTruthy();
+        let componentBeforeInsert = _.cloneDeep(component);
+        await stackRepository.insertOrUpdate(componentBeforeInsert);
+        let componentAfterInsert = await stackRepository.getById(componentBeforeInsert.id);
+        compare(componentBeforeInsert, componentAfterInsert);
     });
 
-    it('should update existing component', async () => {
-        await stackRepository.insertOrUpdate(component);
-        component.customValue = 'customValue'; // new property
-        component.children[0].type = ComponentType.Stack; // change propery
-        let updatedDbComponent = await stackRepository.insertOrUpdate(component);
-        expect(componentsEqual(updatedDbComponent, component)).toBeTruthy();
+    it('should update inserted component', async () => {
+        let componentBeforeInsert = _.cloneDeep(component);
+        let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
+
+        componentAfterInsert.customValue = 'customValue'; // new property
+        componentAfterInsert.children[0].type = ComponentType.Stack; // change propery
+
+        let componentAfterUpdate = await stackRepository.insertOrUpdate(componentAfterInsert);
+        compare(componentAfterInsert, componentAfterUpdate);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 });
