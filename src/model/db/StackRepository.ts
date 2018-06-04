@@ -35,6 +35,14 @@ export class StackRepository {
         return this.mongooseQueryToObject(query);
     }
 
+    public async delete(component: IComponent): Promise<string> {
+        let query = await this.model.deleteOne({id: component.id});
+        if (query.n === 0) {
+            throw new Error(`component ${component.id} does not exist`);
+        }
+        return component.id;
+    }
+
     private mongooseQueryToObject(query): IComponent {
         return new Component(query.toObject());
     }

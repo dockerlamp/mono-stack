@@ -89,4 +89,18 @@ describe('StackRepository', () => {
 
         compare(componentBeforeInsert, componentAfterSecondInsert);
     });
+
+    it('should delete added component', async () => {
+        let clonedComponent = _.cloneDeep(component);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
+        let componentAfterInsert = await stackRepository.insertOrUpdate(clonedComponent);
+        let deletedComponentId = await stackRepository.delete(componentAfterInsert);
+        expect(deletedComponentId).toEqual(componentAfterInsert.id);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
+    });
+
+    it('should raise error when deleting not existing component', async () => {
+        let clonedComponent = _.cloneDeep(component);
+        await expect(stackRepository.delete(clonedComponent)).rejects.toBeInstanceOf(Error);
+    });
 });

@@ -30,9 +30,18 @@ export class StackService {
         return stack;
     }
 
-    public async remove(stack: Stack, user: IUser): Promise<void> {
-        // @ TODO not implemented in repository
-        return;
+    public async remove(stack: Stack, user: IUser): Promise<string> {
+        if (!stack.user) {
+            throw new Error(`stack ${stack.id} is anonymous, use 'removeAnonymous' method`);
+        }
+        return await this.stackRepository.delete(stack);
+    }
+
+    public async removeAnonymous(stack: Stack): Promise<string> {
+        if (stack.user) {
+            throw new Error(`stack ${stack.id} is signed, use 'remove' method`);
+        }
+        return await this.stackRepository.delete(stack);
     }
 
     public async getUserStackList(user: IUser): Promise<Stack[]> {
