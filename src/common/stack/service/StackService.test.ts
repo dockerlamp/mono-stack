@@ -103,9 +103,8 @@ describe('StackService', () => {
         signedStack.user = loggedUser;
 
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
-        stackService.add(signedStack, loggedUser);
-        // @TODO expression below should work, but id does not
-        // expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+        await stackService.add(signedStack, loggedUser);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
     it('should raise error when adding signed stack owned by other user', async () => {
@@ -167,11 +166,8 @@ describe('StackService', () => {
         await expect(stackService.get(clonedAnonymousStack.id, loggedUser)).rejects.toBeInstanceOf(Error);
     });
 
-    it.skip('should get already added signed stack', async () => {
-        // @TODO check why this test fails
+    it('should get already added signed stack', async () => {
         let loggedUser = await userService.login(user);
-
-        // make `loggedUser` owner of the stack
         let signedStack = _.cloneDeep(anonymousStack);
         signedStack.user = loggedUser;
 
@@ -260,12 +256,12 @@ describe('StackService', () => {
     });
 
     it.skip('should raise error while signing already signed stack', async () => {
-        // @TODO does not work => check it
         let loggedUser = await userService.login(user);
 
         let signedStack = _.cloneDeep(anonymousStack);
         signedStack.user = loggedUser;
 
-        expect(stackService.makeSigned(signedStack, loggedUser)).toThrow();
+        // @TODO how to catch thrown exception in sync method? this does not work
+        expect(stackService.makeSigned(signedStack, loggedUser)).toThrow(Error);
     });
 });

@@ -26,12 +26,12 @@ export class StackRepository {
             delete element.parent;
         }
         let query = await this.model.findOneAndUpdate({id: component.id},
-            component, {upsert: true, new: true});
+            component, {upsert: true, new: true}).populate('user');
         return this.mongooseQueryToObject(query);
     }
 
     public async getById(id: string): Promise<IComponent> {
-        let query = await this.model.findOne({id});
+        let query = await this.model.findOne({id}).populate('user');
         return this.mongooseQueryToObject(query);
     }
 

@@ -9,6 +9,7 @@ import { Component } from '../../common/stack/Component';
 import { ComponentType } from '../../common/stack/interface/ComponentType';
 import { removeParents } from '../../../test/integration/helpers/removeParents';
 import { COMPONENT_COLLECTION } from '../../../src/model/db/StackRepository';
+import { UserModel } from '../user/model/UserModel';
 
 describe('StackRepository', () => {
     let stackRepository: StackRepository;
@@ -28,6 +29,7 @@ describe('StackRepository', () => {
         testDbContainer = getTestDbContainer();
         connection = testDbContainer.get(MongoConnection).getConnection();
         stackRepository = testDbContainer.get(StackRepositoryFactory).create();
+        testDbContainer.get(UserModel); // init model for stack repository
         testDbContainer.reset();
     });
 

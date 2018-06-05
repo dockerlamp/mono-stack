@@ -1,4 +1,5 @@
 import { Service } from 'typedi';
+import * as _ from 'lodash';
 
 import { Stack } from './../Stack';
 import { IUser } from '../../../model/user/model/IUser-types';
@@ -14,7 +15,10 @@ export class StackService {
             throw new Error(`stack ${stack.id} is anonymous`);
         }
 
-        if (stack.user._id !== user._id) {
+        // @TODO this comparison does not work !!!
+        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
+        if (stack.user.providerIds.github !== user.providerIds.github) {
+            // @TODO check email as well?
             throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
         }
 
@@ -55,9 +59,13 @@ export class StackService {
             throw new Error(`stack ${stack.id} is anonymous, use 'getAnonymous' method`);
         }
 
-        if (stack.user._id !== user._id) {
+        // @TODO this comparison does not work !!!
+        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
+        if (stack.user.providerIds.github !== user.providerIds.github) {
+            // @TODO check email as well?
             throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
         }
+
         return stack;
     }
 
