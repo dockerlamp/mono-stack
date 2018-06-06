@@ -14,14 +14,7 @@ export class StackService {
         if (!stack.user) {
             throw new Error(`stack ${stack.id} is anonymous`);
         }
-
-        // @TODO this comparison does not work !!!
-        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
-        if (stack.user.providerIds.github !== user.providerIds.github) {
-            // @TODO check email as well?
-            throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
-        }
-
+        this.checkOwnership(stack, user);
         stack = new Stack(await this.stackRepository.insertOrUpdate(stack));
         return stack;
     }
@@ -38,6 +31,7 @@ export class StackService {
         if (!stack.user) {
             throw new Error(`stack ${stack.id} is anonymous, use 'removeAnonymous' method`);
         }
+        this.checkOwnership(stack, user);
         return await this.stackRepository.delete(stack);
     }
 
@@ -58,14 +52,7 @@ export class StackService {
         if (!stack.user) {
             throw new Error(`stack ${stack.id} is anonymous, use 'getAnonymous' method`);
         }
-
-        // @TODO this comparison does not work !!!
-        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
-        if (stack.user.providerIds.github !== user.providerIds.github) {
-            // @TODO check email as well?
-            throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
-        }
-
+        this.checkOwnership(stack, user);
         return stack;
     }
 
@@ -83,5 +70,14 @@ export class StackService {
         }
         stack.user = user;
         return stack;
+    }
+
+    private checkOwnership(stack: Stack, user: IUser): void {
+        // @TODO this comparison does not work !!!
+        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
+        if (stack.user.providerIds.github !== user.providerIds.github) {
+            // @TODO check email as well?
+            throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
+        }
     }
 }

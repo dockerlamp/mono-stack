@@ -206,6 +206,19 @@ describe('StackService', () => {
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
     });
 
+    it('should raise error while deleting other`s user signed stack', async () => {
+        let loggedUser = await userService.login(user);
+        let signedStack = _.cloneDeep(anonymousStack);
+        signedStack.user = loggedUser;
+        let insertedSignedStack = await stackService.add(signedStack, loggedUser);
+        let secondUser = _.cloneDeep(user);
+        secondUser.providerUserId = 'kung-foo-id';
+        secondUser.email = 'kung-foo@bar.com';
+        let secondLoggedUser = await userService.login(secondUser);
+        await expect(stackService.remove(insertedSignedStack, secondLoggedUser)).rejects.toBeInstanceOf(Error);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+    });
+
     // sign stack tests
     it('should sign anonymous stack', async () => {
         let loggedUser = await userService.login(user);
