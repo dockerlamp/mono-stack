@@ -2,7 +2,7 @@ import {} from 'jest';
 import * as _ from 'lodash';
 
 import { getTestDbContainer } from '../../../../test/integration/helpers/getTestDbContainer';
-import { removeParents } from '../../../../test/integration/helpers/removeParents';
+import { compareComponent } from '../../../../test/integration/helpers/compareComponent';
 import { MongoConnection } from '../../../../src/model/db/MongoConnection';
 import { COMPONENT_COLLECTION } from '../../../../src/model/db/StackRepository';
 import { USER_COLLECTION } from '../../../../src/model/user/model/UserModel';
@@ -40,20 +40,6 @@ describe('StackService', () => {
     let stackService: StackService;
     let userService: UserService;
 
-    // @ TODO make as helper (same code in StackRepository test)
-    let compare = (firstComponent, secondComponent) => {
-        // eliminate circular references for compare
-        removeParents(firstComponent);
-        removeParents(secondComponent);
-        // eliminate specific attribues added by mongoose for compare
-        let attributes = ['__v', '_id', '$setOnInsert'];
-
-        expect(_.omit(firstComponent, attributes)).toMatchObject(
-            _.omit(secondComponent, attributes));
-        expect(_.omit(secondComponent, attributes)).toMatchObject(
-            _.omit(firstComponent, attributes));
-    };
-
     beforeAll(async () => {
         testDbContainer = getTestDbContainer();
         connection = testDbContainer.get(MongoConnection).getConnection();
@@ -87,12 +73,12 @@ describe('StackService', () => {
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
         let firstlyInsertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
         expect(firstlyInsertedAnonymousStack).toBeInstanceOf(Stack);
-        compare(clonedAnonymousStack, firstlyInsertedAnonymousStack);
+        compareComponent(clonedAnonymousStack, firstlyInsertedAnonymousStack);
 
         let secondlyInsertedAnonymousStack = await stackService.addAnonymous(firstlyInsertedAnonymousStack);
         expect(secondlyInsertedAnonymousStack).toBeInstanceOf(Stack);
-        compare(clonedAnonymousStack, secondlyInsertedAnonymousStack);
-        compare(firstlyInsertedAnonymousStack, secondlyInsertedAnonymousStack);
+        compareComponent(clonedAnonymousStack, secondlyInsertedAnonymousStack);
+        compareComponent(firstlyInsertedAnonymousStack, secondlyInsertedAnonymousStack);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
@@ -136,7 +122,7 @@ describe('StackService', () => {
         toUpdateAnonymousStack.children[0].type = ComponentType.Stack; // change propery
 
         let updatedAnonymousStack = await stackService.addAnonymous(toUpdateAnonymousStack);
-        compare(updatedAnonymousStack, toUpdateAnonymousStack);
+        compareComponent(updatedAnonymousStack, toUpdateAnonymousStack);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
@@ -151,7 +137,7 @@ describe('StackService', () => {
         let gotAnonymousStack = await stackService.getAnonymous(insertedAnonymousStack.id);
 
         expect(gotAnonymousStack).toBeInstanceOf(Stack);
-        compare(gotAnonymousStack, insertedAnonymousStack);
+        compareComponent(gotAnonymousStack, insertedAnonymousStack);
     });
 
     it('should raise error while getting not existing signed stack', async () => {
@@ -173,7 +159,7 @@ describe('StackService', () => {
 
         let insertedSignedStack = await stackService.add(signedStack, loggedUser);
         let gotSignedStack = await stackService.get(insertedSignedStack.id, loggedUser);
-        compare(gotSignedStack, insertedSignedStack);
+        compareComponent(gotSignedStack, insertedSignedStack);
     });
 
     it('should raise error while getting signed stack owned by other user', async () => {
