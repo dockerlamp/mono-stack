@@ -15,9 +15,7 @@ export const COMPONENT_COLLECTION = 'component';
 export class StackRepository {
     private model;
 
-    constructor(
-        private connection: Connection
-    ) {
+    constructor(private connection: Connection) {
         this.model = connection.model(COMPONENT_COLLECTION, StackSchema, COMPONENT_COLLECTION);
     }
 

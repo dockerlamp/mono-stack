@@ -43,7 +43,6 @@ describe('StackRepository', () => {
 
     it('should insert component', async () => {
         let componentBeforeInsert = _.cloneDeep(component);
-        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toBeUndefined();
         let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
         compareComponent(componentBeforeInsert, componentAfterInsert);
@@ -52,6 +51,7 @@ describe('StackRepository', () => {
     it('should get inserted component by id', async () => {
         let componentBeforeInsert = _.cloneDeep(component);
         await stackRepository.insertOrUpdate(componentBeforeInsert);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
         let componentAfterInsert = await stackRepository.getById(componentBeforeInsert.id);
         compareComponent(componentBeforeInsert, componentAfterInsert);
     });
@@ -59,30 +59,27 @@ describe('StackRepository', () => {
     it('should update inserted component', async () => {
         let componentBeforeInsert = _.cloneDeep(component);
         let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
-
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
         componentAfterInsert.customValue = 'customValue'; // new property
         componentAfterInsert.children[0].type = ComponentType.Stack; // change propery
-
         let componentAfterUpdate = await stackRepository.insertOrUpdate(componentAfterInsert);
-        compareComponent(componentAfterInsert, componentAfterUpdate);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
+        compareComponent(componentAfterInsert, componentAfterUpdate);
     });
 
     it('should handle multiple insertion of the same component', async () => {
         let componentBeforeInsert = _.cloneDeep(component);
         let componentAfterInsert = await stackRepository.insertOrUpdate(componentBeforeInsert);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
-
         let componentAfterSecondInsert = await stackRepository.insertOrUpdate(componentAfterInsert);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
-
         compareComponent(componentBeforeInsert, componentAfterSecondInsert);
     });
 
     it('should delete added component', async () => {
         let clonedComponent = _.cloneDeep(component);
-        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
         let componentAfterInsert = await stackRepository.insertOrUpdate(clonedComponent);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
         let deletedComponentId = await stackRepository.delete(componentAfterInsert);
         expect(deletedComponentId).toEqual(componentAfterInsert.id);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);

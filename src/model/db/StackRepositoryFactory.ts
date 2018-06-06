@@ -6,10 +6,7 @@ import { MongoConnection } from './MongoConnection';
 
 @Service()
 export class StackRepositoryFactory {
-    constructor(
-        private mongoConnection: MongoConnection
-    ) {
-    }
+    constructor(private mongoConnection: MongoConnection) {}
 
     public create() {
         return new StackRepository(this.mongoConnection.getConnection());
