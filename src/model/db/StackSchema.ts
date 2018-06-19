@@ -12,5 +12,9 @@ export const StackSchema = new Schema({
     children: [],
     links: [],
     ports: [],
-    user: {type: Schema.Types.ObjectId, ref: 'user'},
+    // user: {type: Schema.Types.ObjectId, ref: 'user'},
+    userId: {
+        type: String,
+        required: false,
+    }
 }, {strict: false});
