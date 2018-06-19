@@ -2,82 +2,87 @@ import { Service } from 'typedi';
 import * as _ from 'lodash';
 
 import { Stack } from './../Stack';
-import { IUser } from '../../../model/user/model/IUser-types';
+import { ILoginUser } from '../../../../src/model/user/service/ILoginUser';
 import { StackRepository } from '../../../model/db/StackRepository';
+import { UserModel } from '../../../../src/model/user/model/UserModel';
 
 @Service()
 export class StackService {
 
-    constructor(private stackRepository: StackRepository) {}
+    constructor(private stackRepository: StackRepository,
+                private userModel: UserModel) {}
 
-    public async add(stack: Stack, user: IUser): Promise<Stack> {
-        if (!stack.user) {
-            throw new Error(`stack ${stack.id} is anonymous`);
-        }
-        this.checkOwnership(stack, user);
+    public async add(stack: Stack, user: ILoginUser): Promise<Stack> {
+        this.checkIfSigned(stack);
+        await this.checkOwnership(stack, user);
         stack = new Stack(await this.stackRepository.insertOrUpdate(stack));
         return stack;
     }
 
     public async addAnonymous(stack: Stack): Promise<Stack> {
-        if (stack.user) {
-            throw new Error(`stack ${stack.id} is signed, use 'add' method`);
-        }
+        this.checkIfAnonymous(stack);
         stack = new Stack(await this.stackRepository.insertOrUpdate(stack));
         return stack;
     }
 
-    public async remove(stack: Stack, user: IUser): Promise<string> {
-        if (!stack.user) {
-            throw new Error(`stack ${stack.id} is anonymous, use 'removeAnonymous' method`);
-        }
-        this.checkOwnership(stack, user);
+    public async remove(stack: Stack, user: ILoginUser): Promise<string> {
+        this.checkIfSigned(stack);
+        await this.checkOwnership(stack, user);
         return await this.stackRepository.delete(stack);
     }
 
     public async removeAnonymous(stack: Stack): Promise<string> {
-        if (stack.user) {
-            throw new Error(`stack ${stack.id} is signed, use 'remove' method`);
-        }
+        this.checkIfAnonymous(stack);
         return await this.stackRepository.delete(stack);
     }
 
-    public async getUserStackList(user: IUser): Promise<Stack[]> {
+    public async getUserStackList(user: ILoginUser): Promise<Stack[]> {
         // @ TODO not implemented in repository
         return;
     }
 
-    public async get(stackId: string, user: IUser): Promise<Stack> {
+    public async get(stackId: string, user: ILoginUser): Promise<Stack> {
         let stack = new Stack(await this.stackRepository.getById(stackId));
-        if (!stack.user) {
-            throw new Error(`stack ${stack.id} is anonymous, use 'getAnonymous' method`);
-        }
-        this.checkOwnership(stack, user);
+        this.checkIfSigned(stack);
+        await this.checkOwnership(stack, user);
         return stack;
     }
 
     public async getAnonymous(stackId: string): Promise<Stack> {
         let stack = new Stack(await this.stackRepository.getById(stackId));
-        if (stack.user) {
-            throw new Error(`stack ${stack.id} is signed, use 'get' method`);
-        }
+        this.checkIfAnonymous(stack);
         return stack;
     }
 
-    public makeSigned(stack: Stack, user: IUser): Stack {
-        if (stack.user) {
+    public async makeSigned(stack: Stack, user: ILoginUser): Promise<Stack> {
+        if (stack.userId) {
             throw new Error(`stack ${stack.id} is already signed`);
         }
-        stack.user = user;
+        let userId = await this.getUserId(user);
+        stack.userId = userId;
         return stack;
     }
 
-    private checkOwnership(stack: Stack, user: IUser): void {
-        // @TODO this comparison does not work !!!
-        // _.isEqual(loggedUser.providerIds, insertedSignedStack.user.providerIds)
-        if (stack.user.providerIds.github !== user.providerIds.github) {
-            // @TODO check email as well?
-            throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`);
+    private async getUserId(user: ILoginUser): Promise<string> {
+        let dbUser = await this.userModel.getUserByProvider(user.provider, user.providerUserId);
+        return dbUser.id;
+    }
+
+    private async checkOwnership(stack: Stack, user: ILoginUser): Promise<void> {
+        let userId = await this.getUserId(user);
+        if (stack.userId !== userId) { throw new Error(`user ${user.userName} is not the owner of stack ${stack.id}`); }
+    }
+
+    private checkIfSigned(stack: Stack): void {
+        if (!stack.userId) {
+            throw new Error(`stack ${stack.id} is anonymous, signed stack required`);
         }
     }
+
+    private checkIfAnonymous(stack: Stack): void {
+        if (stack.userId) {
+            throw new Error(`stack ${stack.id} is signed, anonymous stack required`);
+        }
+    }
+
 }
