@@ -37,6 +37,12 @@ export class StackRepository {
         return this.mongooseQueryToObject(query);
     }
 
+    public async getByUserId(id: string): Promise<IComponent[]> {
+        let query = await this.model.find({userId: id});
+        let components = _.map(query, (value) => this.mongooseQueryToObject(value));
+        return components;
+    }
+
     public async delete(component: IComponent): Promise<string> {
         let query = await this.model.deleteOne({id: component.id});
         if (query.n === 0) {

@@ -89,4 +89,28 @@ describe('StackRepository', () => {
         let clonedComponent = _.cloneDeep(component);
         await expect(stackRepository.delete(clonedComponent)).rejects.toBeInstanceOf(Error);
     });
+
+    it('should get all user components', async () => {
+        let userId = 'fakeUserId';
+        let componentsCount = 2;
+
+        let firstComponent = _.cloneDeep(component);
+        firstComponent.userId = userId;
+        await stackRepository.insertOrUpdate(firstComponent);
+
+        let secondComponent = new Component({
+            type: ComponentType.Stack,
+            children: [
+                new Component({
+                    type: ComponentType.Service,
+                }),
+            ],
+        });
+        secondComponent.userId = userId;
+        await stackRepository.insertOrUpdate(secondComponent);
+
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(componentsCount);
+        let components = await stackRepository.getByUserId(userId);
+        expect(components).toHaveLength(componentsCount);
+    });
 });
