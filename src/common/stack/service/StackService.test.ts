@@ -69,41 +69,60 @@ describe('StackService', () => {
 
     it('should be the same anonymous stack on multiple additon', async () => {
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let firstlyInsertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
-        expect(firstlyInsertedAnonymousStack).toBeInstanceOf(Stack);
-        compareComponent(clonedAnonymousStack, firstlyInsertedAnonymousStack);
-        let secondlyInsertedAnonymousStack = await stackService.addAnonymous(firstlyInsertedAnonymousStack);
-        expect(secondlyInsertedAnonymousStack).toBeInstanceOf(Stack);
-        compareComponent(clonedAnonymousStack, secondlyInsertedAnonymousStack);
-        compareComponent(firstlyInsertedAnonymousStack, secondlyInsertedAnonymousStack);
+        let firstlyAddedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        expect(firstlyAddedAnonymousStack).toBeInstanceOf(Stack);
+        compareComponent(clonedAnonymousStack, firstlyAddedAnonymousStack);
+        let secondlyAddedAnonymousStack = await stackService.addAnonymous(firstlyAddedAnonymousStack);
+        expect(secondlyAddedAnonymousStack).toBeInstanceOf(Stack);
+        compareComponent(clonedAnonymousStack, secondlyAddedAnonymousStack);
+        compareComponent(firstlyAddedAnonymousStack, secondlyAddedAnonymousStack);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
+    // stack signing tests
+    it('should sign anonymous stack', async () => {
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        expect(clonedAnonymousStack).not.toHaveProperty('userId');
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+        expect(signedStack).toHaveProperty('userId');
+    });
+
+    it('should raise error while signing already signed stack', async () => {
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+        await expect(stackService.makeSigned(signedStack, user)).rejects.toBeInstanceOf(Error);
+    });
+
+    // stack addition tests
     it('should add signed stack for proper user', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        await stackService.add(signedStack, loggedUser);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+        await stackService.add(signedStack, user);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
     it('should raise error when adding signed stack owned by other user', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
         let secondUser = _.cloneDeep(user);
         secondUser.providerUserId = 'kung-foo-id';
         secondUser.email = 'kung-foo@bar.com';
-        let secondLoggedUser = await userService.login(secondUser);
-        await expect(stackService.add(signedStack, secondLoggedUser)).rejects.toBeInstanceOf(Error);
+        await userService.login(secondUser);
+
+        await expect(stackService.add(signedStack, secondUser)).rejects.toBeInstanceOf(Error);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
     });
 
     // update stack tests
     it('should update already added anonymous stack', async () => {
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let insertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
-        let toUpdateAnonymousStack = insertedAnonymousStack;
+        let addedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        let toUpdateAnonymousStack = addedAnonymousStack;
         toUpdateAnonymousStack.customValue = 'customValue'; // new property
         toUpdateAnonymousStack.children[0].type = ComponentType.Stack; // change propery
 
@@ -119,43 +138,45 @@ describe('StackService', () => {
 
     it('should get already added anonymous stack', async () => {
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let insertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
-        let gotAnonymousStack = await stackService.getAnonymous(insertedAnonymousStack.id);
+        let addedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        let gotAnonymousStack = await stackService.getAnonymous(addedAnonymousStack.id);
         expect(gotAnonymousStack).toBeInstanceOf(Stack);
-        compareComponent(gotAnonymousStack, insertedAnonymousStack);
+        compareComponent(gotAnonymousStack, addedAnonymousStack);
     });
 
     it('should raise error while getting not existing signed stack', async () => {
-        let loggedUser = await userService.login(user);
-        await expect(stackService.get(fakeId, loggedUser)).rejects.toBeInstanceOf(TypeError);
+        await expect(stackService.get(fakeId, user)).rejects.toBeInstanceOf(TypeError);
     });
 
     it('should raise error while getting existing anonymous stack using getter for signed stack', async () => {
-        let loggedUser = await userService.login(user);
+        await userService.login(user);
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        await stackService.addAnonymous(clonedAnonymousStack);
-        await expect(stackService.get(clonedAnonymousStack.id, loggedUser)).rejects.toBeInstanceOf(Error);
+        let addedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        await expect(stackService.get(addedAnonymousStack.id, user)).rejects.toBeInstanceOf(Error);
     });
 
     it('should get already added signed stack', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        let insertedSignedStack = await stackService.add(signedStack, loggedUser);
-        let gotSignedStack = await stackService.get(insertedSignedStack.id, loggedUser);
-        compareComponent(gotSignedStack, insertedSignedStack);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
+        let addedSignedStack = await stackService.add(signedStack, user);
+        let gotSignedStack = await stackService.get(addedSignedStack.id, user);
+        compareComponent(gotSignedStack, addedSignedStack);
     });
 
     it('should raise error while getting signed stack owned by other user', async () => {
-        let firstLoggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = firstLoggedUser;
-        let insertedSignedStack = await stackService.add(signedStack, firstLoggedUser);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+        let addedSignedStack = await stackService.add(signedStack, user);
+
         let secondUser = _.cloneDeep(user);
         secondUser.providerUserId = 'kung-foo-id';
         secondUser.email = 'kung-foo@bar.com';
-        let secondLoggedUser = await userService.login(secondUser);
-        await expect(stackService.get(insertedSignedStack.id, secondLoggedUser)).rejects.toBeInstanceOf(Error);
+        await userService.login(secondUser);
+
+        await expect(stackService.get(addedSignedStack.id, secondUser)).rejects.toBeInstanceOf(Error);
     });
 
     // delete stack tests
@@ -165,73 +186,113 @@ describe('StackService', () => {
     });
 
     it('should raise error while deleting signed stack using remover for anonymous stack', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        let insertedSignedStack = await stackService.add(signedStack, loggedUser);
-        await expect(stackService.removeAnonymous(insertedSignedStack)).rejects.toBeInstanceOf(Error);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
+        let addedSignedStack = await stackService.add(signedStack, user);
+        await expect(stackService.removeAnonymous(addedSignedStack)).rejects.toBeInstanceOf(Error);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
     it('should delete previously added anonymous stack', async () => {
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let insertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
-        let deletedStackId = await stackService.removeAnonymous(insertedAnonymousStack);
-        expect(deletedStackId).toEqual(insertedAnonymousStack.id);
+        let addedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        let deletedStackId = await stackService.removeAnonymous(addedAnonymousStack);
+        expect(deletedStackId).toEqual(addedAnonymousStack.id);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
     });
 
     it('should raise error while deleting not existing signed stack', async () => {
         let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        await expect(stackService.remove(signedStack, loggedUser)).rejects.toBeInstanceOf(Error);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
+        await expect(stackService.remove(signedStack, user)).rejects.toBeInstanceOf(Error);
     });
 
     // tslint:disable-next-line:max-line-length
     it('should raise error while deleting previously added anonymous stack using remover for signed stack', async () => {
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let loggedUser = await userService.login(user);
-        let insertedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
-        await expect(stackService.remove(insertedAnonymousStack, loggedUser)).rejects.toBeInstanceOf(Error);
+        await userService.login(user);
+        let addedAnonymousStack = await stackService.addAnonymous(clonedAnonymousStack);
+        await expect(stackService.remove(addedAnonymousStack, user)).rejects.toBeInstanceOf(Error);
     });
 
     it('should delete previously added signed stack', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        let insertedSignedStack = await stackService.add(signedStack, loggedUser);
-        let removedStackId = await stackService.remove(insertedSignedStack, loggedUser);
-        expect(removedStackId).toEqual(insertedSignedStack.id);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
+        let addedSignedStack = await stackService.add(signedStack, user);
+        let removedStackId = await stackService.remove(addedSignedStack, user);
+        expect(removedStackId).toEqual(addedSignedStack.id);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(0);
     });
 
     it('should raise error while deleting other`s user signed stack', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        let insertedSignedStack = await stackService.add(signedStack, loggedUser);
+        await userService.login(user);
+        let clonedAnonymousStack = _.cloneDeep(anonymousStack);
+        let signedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+
+        let addedSignedStack = await stackService.add(signedStack, user);
+
         let secondUser = _.cloneDeep(user);
         secondUser.providerUserId = 'kung-foo-id';
         secondUser.email = 'kung-foo@bar.com';
-        let secondLoggedUser = await userService.login(secondUser);
-        await expect(stackService.remove(insertedSignedStack, secondLoggedUser)).rejects.toBeInstanceOf(Error);
+        await userService.login(secondUser);
+
+        await expect(stackService.remove(addedSignedStack, secondUser)).rejects.toBeInstanceOf(Error);
         expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(1);
     });
 
-    // sign stack tests
-    it('should sign anonymous stack', async () => {
-        let loggedUser = await userService.login(user);
+    it('should return array of user signed stacks', async () => {
+        // add two signed stacks for user
+        await userService.login(user);
         let clonedAnonymousStack = _.cloneDeep(anonymousStack);
-        let signedStack = stackService.makeSigned(clonedAnonymousStack, loggedUser);
-        expect(signedStack).toHaveProperty('user');
-    });
+        let firstSignedStack = await stackService.makeSigned(clonedAnonymousStack, user);
+        await stackService.add(firstSignedStack, user);
+        let secondAnonymousStack = new Stack({
+            type: ComponentType.Stack,
+            children: [
+                new Component({
+                    type: ComponentType.Service,
+                }),
+            ],
+        });
+        let secondSignedStack = await stackService.makeSigned(secondAnonymousStack, user);
+        await stackService.add(secondSignedStack, user);
 
-    it.skip('should raise error while signing already signed stack', async () => {
-        let loggedUser = await userService.login(user);
-        let signedStack = _.cloneDeep(anonymousStack);
-        signedStack.user = loggedUser;
-        // @TODO how to catch thrown exception in sync method? this does not work
-        expect(stackService.makeSigned(signedStack, loggedUser)).toThrow(Error);
+        // add second user and signed stack for him
+        let secondUser = _.cloneDeep(user);
+        secondUser.providerUserId = 'kung-foo-id';
+        secondUser.email = 'kung-foo@bar.com';
+        await userService.login(secondUser);
+        let thirdAnonymousStack = new Stack({
+            type: ComponentType.Stack,
+            children: [
+                new Component({
+                    type: ComponentType.Service,
+                }),
+            ],
+        });
+        let thirdSignedStack = await stackService.makeSigned(thirdAnonymousStack, secondUser);
+        await stackService.add(thirdSignedStack, secondUser);
+
+        // add fourth, anonymous stack
+        let fourthAnonymousStack = new Stack({
+            type: ComponentType.Stack,
+            children: [
+                new Component({
+                    type: ComponentType.Service,
+                }),
+            ],
+        });
+        await stackService.addAnonymous(fourthAnonymousStack);
+
+        // get stacks for user
+        let userStacks = await stackService.getUserStacks(user);
+        expect(await connection.collection(COMPONENT_COLLECTION).count({})).toEqual(4);
+        expect(userStacks).toHaveLength(2);
     });
 });
