@@ -23,23 +23,19 @@ export class StackRepository {
         for (let element of component.walk()) {
             delete element.parent;
         }
-        // let query = await this.model.findOneAndUpdate({id: component.id},
-        //     component, {upsert: true, new: true}).populate('user');
-
         let query = await this.model.findOneAndUpdate({id: component.id},
             component, {upsert: true, new: true});
-        return this.mongooseQueryToObject(query);
+        return this.toComponent(query);
     }
 
     public async getById(id: string): Promise<IComponent> {
-        // let query = await this.model.findOne({id}).populate('user');
         let query = await this.model.findOne({id});
-        return this.mongooseQueryToObject(query);
+        return this.toComponent(query);
     }
 
     public async getByUserId(id: string): Promise<IComponent[]> {
         let query = await this.model.find({userId: id});
-        let components = _.map(query, (value) => this.mongooseQueryToObject(value));
+        let components = _.map(query, (value) => this.toComponent(value));
         return components;
     }
 
@@ -51,7 +47,7 @@ export class StackRepository {
         return component.id;
     }
 
-    private mongooseQueryToObject(query): IComponent {
+    private toComponent(query): IComponent {
         return new Component(query.toObject());
     }
 }
