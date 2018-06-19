@@ -36,9 +36,10 @@ export class StackService {
         return await this.stackRepository.delete(stack);
     }
 
-    public async getUserStackList(user: ILoginUser): Promise<Stack[]> {
-        // @ TODO not implemented in repository
-        return;
+    public async getUserStacks(user: ILoginUser): Promise<Stack[]> {
+        let id = await this.getUserId(user);
+        let stacks = _.map(await this.stackRepository.getByUserId(id), (component) => new Stack(component));
+        return stacks;
     }
 
     public async get(stackId: string, user: ILoginUser): Promise<Stack> {
