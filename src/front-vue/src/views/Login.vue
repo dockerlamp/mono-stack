@@ -19,9 +19,3 @@ import Login from '@/components/Login.vue';
 export default class LoginView extends Vue {
 }
 </script>
-
-<style lang="scss">
-#login-view {
-  text-align: center;
-}
-</style>
