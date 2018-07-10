@@ -4,9 +4,6 @@ import App from './App.vue';
 import router from './router';
 
 new Vue({
-  router,
-  render: (h) => h(App),
-  data: {
-      name: 'Timmy alright',
-  },
+    router,
+    render: (h) => h(App),
 }).$mount('#app');
