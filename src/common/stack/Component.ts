@@ -48,6 +48,16 @@ export class Component implements IComponent {
         return currentNode;
     }
 
+    public getNestingLevel(): Number {
+        let currentNode: Component = this;
+        let level = 0;
+        while (currentNode.parent) {
+            level++;
+            currentNode = currentNode.parent;
+        }
+        return level;
+    }
+
     public toJSON(): any {
         return _.omit(this, 'parent');
     }

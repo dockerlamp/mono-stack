@@ -1,5 +1,6 @@
 <template>
     <div>
+        <link rel="stylesheet" type="text/css" href="../../../vendor/vis-network.min.css" />
         <div id="canvas" ref="canvas"></div>
     </div>
 </template>
@@ -22,76 +23,37 @@ import vis from 'vis';
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator';
 
 import { Stack } from '../../../../common/stack/Stack';
-import { Component as StackComponent } from '../../../../common/stack/Component';
-import { ComponentType } from '../../../../common/stack/interface/ComponentType';
+
+import { sampleStack } from '../sampleStack';
 
 @Component
 export default class Canvas extends Vue {
 
     public network: vis.Network;
-
-    public stack = new Stack({
-        type: ComponentType.Stack,
-        name: 'ParentStack',
-        children: [
-            new StackComponent({
-                type: ComponentType.Service,
-                name: 'ChildService1',
-                children: [
-                    new StackComponent({
-                        type: ComponentType.Service,
-                        name: 'ChildService1.1',
-                    }),
-                    new StackComponent({
-                        type: ComponentType.Service,
-                        name: 'ChildService1.2',
-                    }),
-                ]
-            }),
-            new StackComponent({
-                type: ComponentType.Service,
-                name: 'ChildService2',
-            }),
-        ],
-    });
-
-    public componentsToNodes(stack: Stack): any {
-        let nodes = [];
-        for (let component of this.stack.walk()) {
-            nodes.push({
-                id: component.id,
-                label: component.name,
-            });
-        }
-        return new vis.DataSet(nodes);
-    }
-
-    public componentHierarchyToEdges(stack: Stack): any {
-        let edges = [];
-        for (let component of this.stack.walk()) {
-            if (component.parent) {
-                edges.push({
-                    from: component.parent.id,
-                    to: component.id,
-                });
-            }
-        }
-        return new vis.DataSet(edges);
-    }
+    public visNodes: any;
+    public stack = sampleStack;
 
     public createNetwork(component: HTMLElement, nodes: any, edges: any): vis.Network {
         let data = {
             nodes: nodes,
             edges: edges,
         };
-        let options = {};
+        let options = {
+            interaction: {
+                hover: true,
+            }
+        };
         return new vis.Network(component, data, options);
     }
 
     public mounted(): void {
-        let nodes = this.componentsToNodes(this.stack);
-        let edges = this.componentHierarchyToEdges(this.stack);
-        this.network = this.createNetwork(this.$refs.canvas as HTMLElement, nodes, edges);
+        this.visNodes = this.componentsToVisNodes(this.stack);
+        let hierarchyEdgesData = this.hierarchyToEdgesData(this.stack);
+        let linkEdgesData = this.linksToEdgesData(this.stack);
+        let edgesData = hierarchyEdgesData.concat(linkEdgesData);
+        this.network = this.createNetwork(this.$refs.canvas as HTMLElement, this.visNodes, edgesData);
+        let clusteringGroups = this.calculateClusteringGroups(this.visNodes);
+        this.clusterNetworkByHierarchy(this.network, this.visNodes, clusteringGroups);
 
         this.network.on('selectNode', (sth: any) => {
             _.map(sth.nodes, (nodeId) => {
@@ -102,8 +64,98 @@ export default class Canvas extends Vue {
                     }
                 }
             });
-            // _.map(sth.edges, (edgeId) => alert(edgeId));
+        });
+
+        this.network.on('hoverNode', (event: any) => {
+            // alert(event.node);
+        });
+
+        this.network.on('doubleClick', (event: any) => {
+            _.map(event.nodes, (nodeId) => {
+                if (this.network.isCluster(nodeId)) {
+                    this.network.openCluster(nodeId);
+                } else {
+                    // close cluster
+                    let nodeData = this.visNodes.get(nodeId);
+                    this.clusterNodesByItsGroup(this.network, nodeData.group);
+                }
+            });
         });
     }
+
+    public clusterNetworkByHierarchy(network: vis.Network, nodes: any, clusteringGroups: any): void {
+        for (let group of clusteringGroups) {
+            // let node = nodes.get(group);
+            this.clusterNodesByItsGroup(network, group);
+        }
+    }
+
+    private clusterNodesByItsGroup(network: vis.Network, group: string): void {
+        let options = {
+            joinCondition: (nodeOptions: any) => {
+                return nodeOptions.group === group || nodeOptions.id === group;
+            },
+            clusterNodeProperties: {
+                label: group
+            }
+        };
+        network.cluster(options);
+    }
+
+    private calculateClusteringGroups(visNodes: any): any[] {
+        // from bottom level of hierarchy to the top
+        let nodesData = _.map(visNodes.getIds(), (nodeId) => visNodes.get(nodeId));
+        let orderedNodesData = _.sortBy(nodesData, ['level']).reverse();
+        let groupsInClusteringOrder = _.map(orderedNodesData, (nodeData) => nodeData.group);
+        return groupsInClusteringOrder;
+    }
+
+    private componentsToVisNodes(stack: Stack): any {
+        let nodes = [];
+        for (let component of this.stack.walk()) {
+            if (!component.parent) {
+                continue;
+            }
+            nodes.push({
+                id: component.id,
+                label: component.name,
+                level: component.getNestingLevel(),
+                group: component.parent.id,
+            });
+        }
+        return new vis.DataSet(nodes);
+    }
+
+    private linksToEdgesData(stack: Stack): any {
+        let edgesData = [];
+        for (let component of this.stack.walk()) {
+            for (let link of component.links) {
+                edgesData.push({
+                    from: component.id,
+                    to: link.destinationId,
+                });
+            }
+        }
+        return edgesData;
+    }
+
+    private hierarchyToEdgesData(stack: Stack): any {
+        let edgesData = [];
+        for (let component of this.stack.walk()) {
+            if (component.parent) {
+                edgesData.push({
+                    from: component.parent.id,
+                    to: component.id,
+                    dashes: true,
+                    color: {
+                        color: 'lightgray',
+                        highlight: 'lightgray',
+                    }
+                });
+            }
+        }
+        return edgesData;
+    }
+
 }
 </script>
